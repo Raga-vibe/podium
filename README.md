@@ -4,7 +4,7 @@
 
 Live demo: **https://podium-82hb.onrender.com** · Source: this repo.
 
-Try it with one click as a guest: hit **Try the demo** on the landing page, no email or sign-up. Guests land on the demo board with the agent ready; **Reset demo** on the board restores it to its fresh state.
+Try it with one click as a guest: hit **Try the demo** on the landing page, no email or sign-up. Guests land on a fresh demo board with the agent ready; if the board was last reset more than 10 minutes ago, guest entry resets it first, so one judge's ticks, scores and drafts never carry over to the next. **Reset demo** on the board restores it to its fresh state at any time.
 
 Paste a hackathon URL and Podium's agent reads the rules, deadlines, requirements and rubric into a board you and the agent share. You tick things off by hand, the agent scores your project against the rubric, argues with you about the scores, and drafts your submission. Every morning it briefs you on what's left.
 

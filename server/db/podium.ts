@@ -212,16 +212,42 @@ export interface IcsEventInput {
  * lands on the submission deadline, the milestone event IS the deadline
  * event, so no separate "submissions close" event is emitted.
  */
+/**
+ * The full name shown for a hackathon: organizer plus name, unless the name
+ * already carries the organizer (the seeded board's name is
+ * "Builder.io Agent-Native Hackathon", while an imported board may only be
+ * named "Agent-Native Hackathon" with organizer "Builder.io").
+ */
+export function hackathonDisplayName(hackathon: {
+  name: string;
+  organizer: string | null;
+}): string {
+  const organizer = hackathon.organizer?.trim();
+  if (
+    organizer &&
+    !hackathon.name.toLowerCase().includes(organizer.toLowerCase())
+  ) {
+    return `${organizer} ${hackathon.name}`;
+  }
+  return hackathon.name;
+}
+
 export function buildCalendarEvents(
-  hackathon: { id: string; name: string; submissionDeadline: Date | null },
+  hackathon: {
+    id: string;
+    name: string;
+    organizer: string | null;
+    submissionDeadline: Date | null;
+  },
   milestones: MilestoneRow[],
 ): IcsEventInput[] {
+  const name = hackathonDisplayName(hackathon);
   const events: IcsEventInput[] = milestones.map((m) => ({
     uid: `${m.id}@podium`,
     start: m.at,
     end: new Date(m.at.getTime() + 3600000),
-    summary: `${hackathon.name}: ${m.label}`,
-    description: `${m.label} for ${hackathon.name}.`,
+    summary: `${name}: ${m.label}`,
+    description: `${m.label} for ${name}.`,
   }));
   const deadline = hackathon.submissionDeadline;
   const deadlineCovered =
@@ -232,8 +258,8 @@ export function buildCalendarEvents(
       uid: `${hackathon.id}-deadline@podium`,
       start: deadline,
       end: new Date(deadline.getTime() + 3600000),
-      summary: `${hackathon.name}: submissions close`,
-      description: `Submission deadline for ${hackathon.name}.`,
+      summary: `${name}: submissions close`,
+      description: `Submission deadline for ${name}.`,
     });
   }
   return events.sort((a, b) => a.start.getTime() - b.start.getTime());

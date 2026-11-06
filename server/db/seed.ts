@@ -1,3 +1,4 @@
+import { appStateGet, appStatePut } from "@agent-native/core/application-state";
 import { eq } from "drizzle-orm";
 
 import { getDb } from "./index.js";
@@ -71,31 +72,28 @@ const SEED_REQUIREMENTS: Array<{
   },
 ];
 
+/** The official Builder.io Agent-Native Hackathon judging criteria and weights (total 100). */
 const SEED_RUBRIC: Array<{ name: string; weight: number; description: string }> = [
   {
-    name: "Agent-native architecture",
-    weight: 30,
-    description: "Actions, skills and app-state shared by UI and agent",
+    name: "Usefulness & Execution",
+    weight: 40,
+    description: "Does the app solve a real problem, and does it work well end to end?",
+  },
+  {
+    name: "Creativity & Design",
+    weight: 20,
+    description: "How original is the idea, and how polished is the experience?",
   },
   {
     name: "Innovation",
-    weight: 25,
-    description: "A fresh idea that uses the agent-native pattern well",
-  },
-  {
-    name: "Design and UX",
     weight: 20,
-    description: "Polished, clear and pleasant to use",
+    description: "Does it do something new, or use the agent-native pattern in a fresh way?",
   },
   {
-    name: "Completeness",
-    weight: 15,
-    description: "The full flow works end to end",
-  },
-  {
-    name: "Demo quality",
-    weight: 10,
-    description: "A clear demo under 2 minutes",
+    name: "Use of Agent-Native",
+    weight: 20,
+    description:
+      "How well does it use actions, skills and app-state, with the agent as a first-class user?",
   },
 ];
 
@@ -121,6 +119,18 @@ async function insertRequirements(tx: Tx, hackathonId: string): Promise<void> {
   );
 }
 
+async function insertRubric(tx: Tx, hackathonId: string): Promise<void> {
+  await tx.insert(rubricCriteria).values(
+    SEED_RUBRIC.map((c) => ({
+      id: crypto.randomUUID(),
+      hackathonId,
+      name: c.name,
+      weight: c.weight,
+      description: c.description,
+    })),
+  );
+}
+
 async function insertSeedRows(tx: Tx, hackathonId: string): Promise<void> {
   await tx.insert(hackathons).values({
     id: hackathonId,
@@ -139,15 +149,7 @@ async function insertSeedRows(tx: Tx, hackathonId: string): Promise<void> {
     label: "Submissions close",
     at: new Date(DEADLINE),
   });
-  await tx.insert(rubricCriteria).values(
-    SEED_RUBRIC.map((c) => ({
-      id: crypto.randomUUID(),
-      hackathonId,
-      name: c.name,
-      weight: c.weight,
-      description: c.description,
-    })),
-  );
+  await insertRubric(tx, hackathonId);
   await tx.insert(projects).values({
     id: crypto.randomUUID(),
     hackathonId,
@@ -188,9 +190,11 @@ export async function seedBuilderHackathon(): Promise<{
  * seven real rules imported from the hackathon page, which are better demo
  * content than the five generic seed rows. They are set back to open and
  * accepted; scores, draft and briefs are cleared; the project is restored to
- * Podium. Milestones and rubric are the hackathon's facts, so they stay.
- * If the board has no requirements at all, the seed set is inserted instead.
- * Other hackathons are never touched.
+ * Podium and the rubric is restored to the official judging criteria.
+ * Milestones are the hackathon's facts, so they stay. If the board has no
+ * requirements at all, the seed set is inserted instead. Other hackathons
+ * are never touched. The reset time is stamped so guest entry can throttle
+ * its automatic reset.
  */
 export async function resetSeededHackathon(): Promise<{ hackathonId: string }> {
   const db = getDb();
@@ -198,6 +202,7 @@ export async function resetSeededHackathon(): Promise<{ hackathonId: string }> {
   const found = all.find((h) => sameHackathonUrl(h.url, SEED_HACKATHON_URL));
   if (!found) {
     const seeded = await seedBuilderHackathon();
+    await stampDemoBoardReset();
     return { hackathonId: seeded.hackathonId ?? SEED_HACKATHON_ID };
   }
   const hackathonId = found.id;
@@ -226,6 +231,39 @@ export async function resetSeededHackathon(): Promise<{ hackathonId: string }> {
       repoUrl: null,
       demoUrl: null,
     });
+    await tx.delete(rubricCriteria).where(eq(rubricCriteria.hackathonId, hackathonId));
+    await insertRubric(tx, hackathonId);
   });
+  await stampDemoBoardReset();
   return { hackathonId };
+}
+
+/**
+ * The demo board's last reset, kept in the framework's app-state store under
+ * the demo account's email (the framework keys app-state by user email).
+ * Guests share the demo account, so this one timestamp is shared by every
+ * guest entry. A missing or unreadable value means "never reset".
+ */
+const DEMO_APP_STATE_SESSION_ID = "demo@podium.app";
+const DEMO_LAST_RESET_KEY = "demo-board-last-reset";
+
+export async function getDemoBoardLastReset(): Promise<Date | null> {
+  try {
+    const value = await appStateGet(DEMO_APP_STATE_SESSION_ID, DEMO_LAST_RESET_KEY);
+    const at = typeof value?.at === "string" ? new Date(value.at) : null;
+    return at && !Number.isNaN(at.getTime()) ? at : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Record that the demo board was just reset. A failed stamp never fails the reset itself. */
+export async function stampDemoBoardReset(): Promise<void> {
+  try {
+    await appStatePut(DEMO_APP_STATE_SESSION_ID, DEMO_LAST_RESET_KEY, {
+      at: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error("Could not stamp the demo board reset time", error);
+  }
 }

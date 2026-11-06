@@ -8,7 +8,19 @@ function milestone(id: string, label: string, at: Date): MilestoneRow {
 }
 
 const DEADLINE = new Date("2026-11-10T07:59:00.000Z");
-const hackathon = { id: "h1", name: "Builder.io Agent-Native Hackathon", submissionDeadline: DEADLINE };
+const hackathon = {
+  id: "h1",
+  name: "Builder.io Agent-Native Hackathon",
+  organizer: "Builder.io",
+  submissionDeadline: DEADLINE,
+};
+// The live board was imported with the short name; the title still shows the full name.
+const importedHackathon = {
+  id: "h1",
+  name: "Agent-Native Hackathon",
+  organizer: "Builder.io",
+  submissionDeadline: DEADLINE,
+};
 
 describe("buildCalendarEvents", () => {
   it("exports a milestone on the deadline once, keeping the milestone label", () => {
@@ -50,5 +62,20 @@ describe("buildCalendarEvents", () => {
       milestone("m1", "Final submission deadline (11:59 PM PT)", new Date("2026-11-10T08:00:00.000Z")),
     ]);
     expect(events).toHaveLength(2);
+  });
+
+  it("titles events with the full name when the stored name lacks the organizer", () => {
+    const events = buildCalendarEvents(importedHackathon, []);
+    expect(events).toHaveLength(1);
+    expect(events[0].summary).toBe(
+      "Builder.io Agent-Native Hackathon: submissions close",
+    );
+  });
+
+  it("does not double the organizer when the name already carries it", () => {
+    const events = buildCalendarEvents(hackathon, []);
+    expect(events[0].summary).toBe(
+      "Builder.io Agent-Native Hackathon: submissions close",
+    );
   });
 });

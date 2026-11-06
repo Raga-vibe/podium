@@ -2,12 +2,12 @@ import { defineAction, fail } from "@agent-native/core/action";
 import { asc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "../server/db/index.js";
-import { buildIcs, slugify, type IcsEventInput } from "../server/db/podium.js";
+import { buildCalendarEvents, buildIcs, slugify } from "../server/db/podium.js";
 import { hackathons, milestones } from "../server/db/schema.js";
 
 export default defineAction({
   description:
-    "Build a standard .ics calendar file for a hackathon: one event per milestone plus the submission deadline, each with alerts 24 hours and 2 hours before.",
+    "Build a standard .ics calendar file for a hackathon: one event per milestone plus the submission deadline (a milestone that already lands on the deadline is exported once, not twice), each with alerts 24 hours and 2 hours before.",
   schema: z.object({
     hackathonId: z.string().describe("Hackathon id"),
   }),
@@ -33,22 +33,7 @@ export default defineAction({
       .where(eq(milestones.hackathonId, hackathonId))
       .orderBy(asc(milestones.at));
     const now = new Date();
-    const events: IcsEventInput[] = miles.map((m) => ({
-      uid: `${m.id}@podium`,
-      start: m.at,
-      end: new Date(m.at.getTime() + 3600000),
-      summary: `${hackathon.name}: ${m.label}`,
-      description: `${m.label} for ${hackathon.name}.`,
-    }));
-    if (hackathon.submissionDeadline) {
-      events.push({
-        uid: `${hackathon.id}-deadline@podium`,
-        start: hackathon.submissionDeadline,
-        end: new Date(hackathon.submissionDeadline.getTime() + 3600000),
-        summary: `${hackathon.name}: submissions close`,
-        description: `Submission deadline for ${hackathon.name}.`,
-      });
-    }
+    const events = buildCalendarEvents(hackathon, miles);
     return {
       hackathonId,
       filename: `${slugify(hackathon.name)}-deadlines.ics`,

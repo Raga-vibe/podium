@@ -67,11 +67,12 @@ Tone: direct, encouraging, specific. Never inflate scores or invent deadlines, p
 - `save-scores` — store per-criterion scores, compute the weighted total in code.
 - `add-score-note` — record the user's disagreement on a score, for rescoring.
 - `save-draft` / `get-draft` — submission draft.
-- `whats-left` — open requirements, deadline and time left, counts.
-- `export-calendar` — build a .ics file (milestones + deadline, 24h and 2h alerts) in code.
+- `whats-left` — open requirements (any status, each with its status), deadline and time left, weakest criterion, counts. One call answers "what's left?": call it directly, never chain `get-hackathon` for the weakest criterion. Open means not done, whatever the status, so it always agrees with the board's open count.
+- `export-calendar` — build a .ics file (milestones + deadline, 24h and 2h alerts) in code; a milestone that lands on the submission deadline is exported once, not twice.
 - `save-brief` / `get-briefs` — daily briefs.
 - `get-brief-settings` / `save-brief-settings` — daily brief on/off and time (HH:MM).
-- `seed-podium` — idempotent seed of the Builder.io Agent-Native Hackathon.
+- `seed-podium` — idempotent seed of the Builder.io Agent-Native Hackathon (fixed id, see `server/db/seed.ts`).
+- `reset-demo` — restore the seeded demo board to its fresh state; only that board is touched.
 - `view-screen` — current navigation, plus the on-screen hackathon summary.
 
 ### Skills (.agents/skills/)
@@ -87,6 +88,7 @@ The daily brief runs as a scheduled automation (Agent Resources path `jobs/daily
 
 ### Landing page and engine recommendation
 
-- `/` is a public landing page (`app/components/landing/LandingPage.tsx`, route `app/routes/_index.tsx`). It renders without the app shell: `app/root.tsx` passes `isPublicPath` to `AppProviders` for `/` so the session gate does not redirect signed-out visitors, and skips `AppLayout` there. Signed-in visitors are redirected to `/home` via `useSession`. The hero preview is a static mock board built from the app's own tokens, not a screenshot, so no binary assets are needed.
+- `/` is a public landing page (`app/components/landing/LandingPage.tsx`, route `app/routes/_index.tsx`). It renders without the app shell: `app/root.tsx` passes `isPublicPath` to `AppProviders` for `/` so the session gate does not redirect signed-out visitors, and skips `AppLayout` there. Signed-in visitors are redirected to `/home` via `useSession`. The hero shows the real board screenshot (`public/board.png`, with the old mock board as a fallback while the file is missing) and the How it works section shows `public/home.png`. Binary assets cannot be pushed via the snapshot flow, so both PNGs must be uploaded to `public/` on GitHub web.
+- Guest access: the landing page hero and bottom CTA link to `/guest` (`server/routes/guest.get.ts`), a public server route that mints a real Better Auth session for the shared demo account (`demo@podium.app`, created once by signing up on the live app) and redirects to `/home`. The sign-in page has a matching "Continue as guest" link via a custom `renderSignInPage` in `server/plugins/auth.ts` (which also lists `/guest` in `publicPaths`). Guests share the demo board; the board page has a **Reset demo** button (only on the seeded board) that calls `reset-demo`. Normal sign-up is untouched. No secret or deployment key ever reaches the client: the route mints the session server-side with the framework's `createBetterAuthSessionForEmail` / `setBetterAuthSessionCookie`.
 - The landing page ALSO needs `rootAuth: false` in `server/plugins/auth.ts`. The template ships `rootAuth: true` there, and with it the framework's server auth guard serves the sign-in page at `/` (HTTP 200, no redirect) before React Router ever runs, so no client-side change can make `/` public. `workspaceAppPublicPaths: ["/"]` alone does not fix it: the guard checks rootAuth first. Verified Nov 6 by reading the live HTML (standalone auth page, no React markers) and the guard source (`@agent-native/core/dist/server/auth.js`, `createAuthGuardFn`).
 - `app/components/layout/EngineRecommendation.tsx` shows one line at the bottom of chat when the active engine is not Builder.io ("Powered by Gemini. Podium is built for Builder.io, switch to Builder.io for the full experience."), linking to Settings > Model. Dismissal is stored in localStorage (`podium.builder-hint.dismissed`).

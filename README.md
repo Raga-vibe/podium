@@ -4,6 +4,8 @@
 
 Live demo: **https://podium-82hb.onrender.com** · Source: this repo.
 
+Try it with one click as a guest: hit **Try the demo** on the landing page, no email or sign-up. Guests land on the demo board with the agent ready; **Reset demo** on the board restores it to its fresh state.
+
 Paste a hackathon URL and Podium's agent reads the rules, deadlines, requirements and rubric into a board you and the agent share. You tick things off by hand, the agent scores your project against the rubric, argues with you about the scores, and drafts your submission. Every morning it briefs you on what's left.
 
 ![Podium home: hackathon cards with countdowns and progress](docs/screenshots/home.png)
@@ -94,5 +96,5 @@ Podium is built on the [Agent-Native framework](https://www.agent-native.com/doc
 Podium started from the **Agent-Native Chat template** on **November 5, 2026** (scaffolded with `npx --yes @agent-native/core@latest create podium --standalone --template chat`, `@agent-native/core@0.224.0`), and was built during the Builder.io Agent-Native Hackathon.
 
 - **Libraries used:** Agent-Native Core / AgentKit / Toolkit 0.224.0, React 19, React Router 8, Drizzle ORM, zod, Tailwind CSS v4, Radix/shadcn UI, TanStack Query, Sonner, Tabler Icons. No LLM SDK is imported in `actions/` or `app/` — the agent does all reasoning through the framework.
-- **Built new for Podium:** the 8-table Postgres schema + migration, all 22 actions, the 4 skills, the AGENTS.md Podium section, the public landing page at `/`, the Home page (import bar, Today card, hackathon cards with countdowns and progress rings), the hackathon page (mission board with drag reorder and inline edit, rubric coach, timeline, project drawer, submission draft), calendar export, daily-brief settings and job, the chat-footer engine recommendation, dark-first theme with a single amber accent, and this README.
+- **Built new for Podium:** the 8-table Postgres schema + migration, all 23 actions, the 4 skills, the AGENTS.md Podium section, the public landing page at `/` (real board screenshot in the hero, one-click guest access), the Home page (import bar, Today card, hackathon cards with countdowns and progress rings), the hackathon page (mission board with drag reorder and inline edit, rubric coach, timeline, project drawer, submission draft, Reset demo), calendar export, daily-brief settings and job, the chat-footer engine recommendation, dark-first theme with a single amber accent, and this README.
 - **Kept from the template:** the chat shell, AgentSidebar, auth, live sync, application state, and the `hello` / `navigate` / `view-screen` framework actions (with `view-screen` extended for Podium's navigation and selection).

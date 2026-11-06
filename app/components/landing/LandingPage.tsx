@@ -7,6 +7,7 @@ import {
   IconSparkles,
   IconTrophy,
 } from "@tabler/icons-react";
+import { useState } from "react";
 import { Link, Navigate } from "react-router";
 
 import { Button } from "@/components/ui/button";
@@ -15,12 +16,75 @@ const LIVE_URL = "https://podium-82hb.onrender.com";
 const REPO_URL = "https://github.com/Raga-vibe/podium";
 const HACKATHON_URL = "https://www.builder.io/hackathon";
 
-function BoardPreview() {
+/** The old mock board, kept only as a fallback while /board.png is missing. */
+function MockBoard() {
   return (
-    <div
-      aria-hidden
-      className="overflow-hidden rounded-2xl border border-border bg-card text-left shadow-2xl shadow-black/40"
-    >
+    <div className="space-y-3 p-4 sm:p-5">
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold">
+            Builder.io Agent-Native Hackathon
+          </p>
+          <p className="text-xs text-muted-foreground">
+            3 of 5 requirements done · Score 8.4 / 10
+          </p>
+        </div>
+        <span className="rounded-full bg-amber-400/15 px-2.5 py-1 text-xs font-medium text-amber-300">
+          2 days left
+        </span>
+      </div>
+      <ul className="space-y-2">
+        {[
+          { title: "Ship a working demo video", done: true, agent: true },
+          { title: "Submit before Nov 9, 23:59 PT", done: true, agent: true },
+          { title: "Polish the landing page", done: false, agent: false },
+        ].map((item) => (
+          <li
+            key={item.title}
+            className="flex items-center gap-2.5 rounded-lg border border-border bg-background px-3 py-2.5 text-sm"
+          >
+            <span
+              className={`flex size-5 shrink-0 items-center justify-center rounded-full border ${
+                item.done
+                  ? "border-amber-400 bg-amber-400 text-zinc-950"
+                  : "border-muted-foreground/40"
+              }`}
+            >
+              {item.done ? <IconCheck className="size-3.5" /> : null}
+            </span>
+            <span
+              className={`min-w-0 flex-1 truncate ${
+                item.done ? "text-muted-foreground line-through" : "font-medium"
+              }`}
+            >
+              {item.title}
+            </span>
+            {item.agent ? (
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-amber-400/15 px-2 py-0.5 text-xs font-medium text-amber-300">
+                <IconRobot className="size-3" aria-hidden /> agent
+              </span>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+      <p className="rounded-lg bg-muted/60 px-3 py-2 text-xs leading-relaxed text-muted-foreground">
+        <span className="font-medium text-foreground">Agent:</span> your
+        weakest criterion is Creativity and Design. One fix: make the landing
+        page show the real board.
+      </p>
+    </div>
+  );
+}
+
+/**
+ * Hero preview: the real mission board screenshot, framed in a browser
+ * window. Falls back to the mock board while /board.png is missing (the
+ * image is a binary asset, so it is uploaded to public/ on GitHub web).
+ */
+function BoardPreview() {
+  const [failed, setFailed] = useState(false);
+  return (
+    <div className="overflow-hidden rounded-2xl border border-border bg-card text-left shadow-2xl shadow-black/40">
       <div className="flex items-center gap-2 border-b border-border px-4 py-3">
         <span className="size-2.5 rounded-full bg-red-400/70" />
         <span className="size-2.5 rounded-full bg-amber-400/70" />
@@ -29,61 +93,42 @@ function BoardPreview() {
           podium-82hb.onrender.com
         </span>
       </div>
-      <div className="space-y-3 p-4 sm:p-5">
-        <div className="flex flex-wrap items-start justify-between gap-2">
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold">
-              Builder.io Agent-Native Hackathon
-            </p>
-            <p className="text-xs text-muted-foreground">
-              3 of 5 requirements done · Score 8.4 / 10
-            </p>
-          </div>
-          <span className="rounded-full bg-amber-400/15 px-2.5 py-1 text-xs font-medium text-amber-300">
-            2 days left
-          </span>
-        </div>
-        <ul className="space-y-2">
-          {[
-            { title: "Ship a working demo video", done: true, agent: true },
-            { title: "Submit before Nov 9, 23:59 PT", done: true, agent: true },
-            { title: "Polish the landing page", done: false, agent: false },
-          ].map((item) => (
-            <li
-              key={item.title}
-              className="flex items-center gap-2.5 rounded-lg border border-border bg-background px-3 py-2.5 text-sm"
-            >
-              <span
-                className={`flex size-5 shrink-0 items-center justify-center rounded-full border ${
-                  item.done
-                    ? "border-amber-400 bg-amber-400 text-zinc-950"
-                    : "border-muted-foreground/40"
-                }`}
-              >
-                {item.done ? <IconCheck className="size-3.5" /> : null}
-              </span>
-              <span
-                className={`min-w-0 flex-1 truncate ${
-                  item.done ? "text-muted-foreground line-through" : "font-medium"
-                }`}
-              >
-                {item.title}
-              </span>
-              {item.agent ? (
-                <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-amber-400/15 px-2 py-0.5 text-xs font-medium text-amber-300">
-                  <IconRobot className="size-3" aria-hidden /> agent
-                </span>
-              ) : null}
-            </li>
-          ))}
-        </ul>
-        <p className="rounded-lg bg-muted/60 px-3 py-2 text-xs leading-relaxed text-muted-foreground">
-          <span className="font-medium text-foreground">Agent:</span> your
-          weakest criterion is Creativity and Design. One fix: make the landing
-          page show the real board.
-        </p>
-      </div>
+      {failed ? (
+        <MockBoard />
+      ) : (
+        <img
+          src="/board.png"
+          alt="Podium mission board for the Builder.io Agent-Native Hackathon, showing the requirements, progress, rubric score and timeline"
+          width={1280}
+          height={900}
+          className="block h-auto w-full"
+          onError={() => setFailed(true)}
+        />
+      )}
     </div>
+  );
+}
+
+/** Second screenshot, hidden entirely while /home.png is missing. */
+function HomeShot() {
+  const [failed, setFailed] = useState(false);
+  if (failed) return null;
+  return (
+    <figure className="mt-8 overflow-hidden rounded-2xl border border-border bg-card shadow-xl shadow-black/30">
+      <img
+        src="/home.png"
+        alt="Podium home page listing hackathons with progress bars, deadlines and the morning brief"
+        loading="lazy"
+        width={1280}
+        height={900}
+        className="block h-auto w-full"
+        onError={() => setFailed(true)}
+      />
+      <figcaption className="border-t border-border px-4 py-3 text-sm text-muted-foreground">
+        Your hackathons at a glance: progress, deadlines, and the morning
+        brief.
+      </figcaption>
+    </figure>
   );
 }
 
@@ -182,20 +227,26 @@ export default function LandingPage() {
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <Button size="lg" asChild className="bg-amber-400 font-semibold text-zinc-950 hover:bg-amber-300">
-                  <Link to="/home">
-                    Start building free <IconArrowRight className="size-4" aria-hidden />
-                  </Link>
+                  <a href="/guest">
+                    Try the demo <IconArrowRight className="size-4" aria-hidden />
+                  </a>
                 </Button>
                 <Button size="lg" variant="outline" asChild>
                   <a href="#how-it-works">See how it works</a>
                 </Button>
               </div>
               <p className="mt-4 text-sm text-muted-foreground">
+                One click, no sign-up: try the demo board as a guest. The
+                agent just works.{" "}
+                <Link to="/home" className="font-medium text-foreground underline underline-offset-2">
+                  Create your own board
+                </Link>
+              </p>
+              <p className="mt-2 text-sm text-muted-foreground">
                 Live now at{" "}
                 <a href={LIVE_URL} className="font-medium text-foreground underline underline-offset-2">
                   podium-82hb.onrender.com
-                </a>{" "}
-                · No setup for visitors, the agent just works.
+                </a>
               </p>
             </div>
             <BoardPreview />
@@ -213,6 +264,7 @@ export default function LandingPage() {
               </article>
             ))}
           </div>
+          <HomeShot />
         </section>
 
         <section id="features" className="mx-auto w-full max-w-6xl scroll-mt-20 px-4 py-10 sm:px-6">
@@ -239,13 +291,13 @@ export default function LandingPage() {
                 <a href={HACKATHON_URL} target="_blank" rel="noreferrer" className="font-medium text-foreground underline underline-offset-2">
                   Builder.io Agent-Native Hackathon
                 </a>
-                , then use it for yours.
+                , then use it for yours. No email, no sign-up.
               </p>
             </div>
             <Button size="lg" asChild className="shrink-0 bg-amber-400 font-semibold text-zinc-950 hover:bg-amber-300">
-              <Link to="/home">
-                Open Podium <IconArrowRight className="size-4" aria-hidden />
-              </Link>
+              <a href="/guest">
+                Try the demo <IconArrowRight className="size-4" aria-hidden />
+              </a>
             </Button>
           </div>
         </section>

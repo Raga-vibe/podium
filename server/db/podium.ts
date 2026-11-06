@@ -142,6 +142,22 @@ export function latestScores(rows: ScoreRow[]): ScoreRow[] {
   return [...byCriterion.values()];
 }
 
+/** Lowest-scored rubric criterion from the latest scores (null when nothing is scored yet). */
+export function weakestCriterion(
+  criteria: RubricRow[],
+  latest: ScoreRow[],
+): { criterion: RubricRow; score: ScoreRow } | null {
+  let weakest: { criterion: RubricRow; score: ScoreRow } | null = null;
+  for (const criterion of criteria) {
+    const score = latest.find((s) => s.criterionId === criterion.id);
+    if (!score) continue;
+    if (!weakest || score.score < weakest.score.score) {
+      weakest = { criterion, score };
+    }
+  }
+  return weakest;
+}
+
 export function slugify(name: string): string {
   const slug = name
     .toLowerCase()
@@ -188,6 +204,39 @@ export interface IcsEventInput {
   end: Date;
   summary: string;
   description: string;
+}
+
+/**
+ * Calendar events for a hackathon: one per milestone, plus the submission
+ * deadline, but never twice for the same instant. When a milestone already
+ * lands on the submission deadline, the milestone event IS the deadline
+ * event, so no separate "submissions close" event is emitted.
+ */
+export function buildCalendarEvents(
+  hackathon: { id: string; name: string; submissionDeadline: Date | null },
+  milestones: MilestoneRow[],
+): IcsEventInput[] {
+  const events: IcsEventInput[] = milestones.map((m) => ({
+    uid: `${m.id}@podium`,
+    start: m.at,
+    end: new Date(m.at.getTime() + 3600000),
+    summary: `${hackathon.name}: ${m.label}`,
+    description: `${m.label} for ${hackathon.name}.`,
+  }));
+  const deadline = hackathon.submissionDeadline;
+  const deadlineCovered =
+    deadline !== null &&
+    milestones.some((m) => m.at.getTime() === deadline.getTime());
+  if (deadline && !deadlineCovered) {
+    events.push({
+      uid: `${hackathon.id}-deadline@podium`,
+      start: deadline,
+      end: new Date(deadline.getTime() + 3600000),
+      summary: `${hackathon.name}: submissions close`,
+      description: `Submission deadline for ${hackathon.name}.`,
+    });
+  }
+  return events.sort((a, b) => a.start.getTime() - b.start.getTime());
 }
 
 export function buildIcs(events: IcsEventInput[], now: Date): string {

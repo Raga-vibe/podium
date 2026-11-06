@@ -11,7 +11,7 @@ Write the morning brief: time left, top open items, weakest criterion. Save it s
 
 1. Call `get-brief-settings` first. If `enabled` is false, stop and say the daily brief is off.
 2. Call `list-hackathons`. The active hackathons are the ones with a `submissionDeadline` in the future.
-3. For each active hackathon, call `whats-left` for its open items and time left, and `get-hackathon` for its latest scores and weakest rubric criterion (lowest score; "not scored yet" when there are no scores).
+3. For each active hackathon, call `whats-left` once: it returns the open items (every requirement that is not done, whatever its status, each with its status so items still waiting for approval can be named), the deadline, time left, and the weakest rubric criterion (lowest score; null when nothing is scored yet). Do not call `get-hackathon` for the weakest criterion.
 4. Write one short brief covering all active hackathons: time left per hackathon, the top three open items overall, and the weakest rubric criterion per hackathon. Keep it under 150 words.
 5. Save it with `save-brief`. Use the `hackathonId` of the most urgent hackathon (nearest deadline), or omit it when there are no active hackathons.
 6. If there are no active hackathons, save a one-line brief saying so instead.

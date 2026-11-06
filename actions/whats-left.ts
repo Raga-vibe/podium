@@ -1,19 +1,28 @@
 import { defineAction, fail } from "@agent-native/core/action";
-import { and, asc, eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "../server/db/index.js";
-import { serializeRequirement } from "../server/db/podium.js";
-import { hackathons, requirements } from "../server/db/schema.js";
+import {
+  latestScores,
+  serializeRequirement,
+  weakestCriterion,
+} from "../server/db/podium.js";
+import { hackathons, requirements, rubricCriteria, scores } from "../server/db/schema.js";
 import { requirementOutputSchema } from "./add-requirement.js";
 
 export default defineAction({
-  description: "List what's left for a hackathon: open accepted requirements, deadline and time left, and counts.",
+  description:
+    "List what's left for a hackathon in one call: open requirements (any status), deadline and time left, weakest criterion, and counts. Call this directly for 'what's left?' questions.",
   schema: z.object({
     hackathonId: z.string().describe("Hackathon id"),
   }),
   outputSchema: z.object({
     hackathonId: z.string().describe("Hackathon id"),
-    open: z.array(requirementOutputSchema).describe("Open accepted requirements, in board order"),
+    open: z
+      .array(requirementOutputSchema)
+      .describe(
+        "Open requirements in board order, whatever their status. Each item includes its status (proposed or accepted), so items still waiting for approval can be mentioned.",
+      ),
     deadline: z.string().nullable().describe("Submission deadline as an ISO string, or null"),
     timeLeft: z
       .object({
@@ -22,6 +31,16 @@ export default defineAction({
       })
       .nullable()
       .describe("Time left until the deadline, or null when no deadline is set"),
+    weakestCriterion: z
+      .object({
+        criterionId: z.string().describe("Rubric criterion id"),
+        name: z.string().describe("Rubric criterion name"),
+        weight: z.number().describe("Rubric criterion weight (percent)"),
+        score: z.number().describe("Latest score for the criterion, 0-10"),
+        topFix: z.string().nullable().describe("Highest-impact fix for the criterion, or null"),
+      })
+      .nullable()
+      .describe("Lowest-scored rubric criterion, or null when nothing is scored yet"),
     counts: z.object({
       total: z.number().describe("Total requirements"),
       done: z.number().describe("Completed requirements"),
@@ -38,24 +57,23 @@ export default defineAction({
       .where(eq(hackathons.id, hackathonId))
       .limit(1);
     if (!hackathon) fail(`Hackathon not found: ${hackathonId}`, { statusCode: 404 });
-    const [all, open] = await Promise.all([
+    const [all, rubric, scoreRows] = await Promise.all([
       db
         .select()
         .from(requirements)
-        .where(eq(requirements.hackathonId, hackathonId)),
-      db
-        .select()
-        .from(requirements)
-        .where(
-          and(
-            eq(requirements.hackathonId, hackathonId),
-            eq(requirements.done, false),
-            eq(requirements.status, "accepted"),
-          ),
-        )
+        .where(eq(requirements.hackathonId, hackathonId))
         .orderBy(asc(requirements.order)),
+      db
+        .select()
+        .from(rubricCriteria)
+        .where(eq(rubricCriteria.hackathonId, hackathonId)),
+      db.select().from(scores).where(eq(scores.hackathonId, hackathonId)),
     ]);
-    const done = all.filter((r) => r.done).length;
+    // Open means not done, whatever the status: this is the same count the
+    // board shows (list-hackathons openCount), so the two can never disagree.
+    const open = all.filter((r) => !r.done);
+    const done = all.length - open.length;
+    const weakest = weakestCriterion(rubric, latestScores(scoreRows));
     let timeLeft: { days: number; hours: number } | null = null;
     if (hackathon.submissionDeadline) {
       const diffMs =
@@ -71,7 +89,16 @@ export default defineAction({
         ? hackathon.submissionDeadline.toISOString()
         : null,
       timeLeft,
-      counts: { total: all.length, done, open: all.length - done },
+      weakestCriterion: weakest
+        ? {
+            criterionId: weakest.criterion.id,
+            name: weakest.criterion.name,
+            weight: weakest.criterion.weight,
+            score: weakest.score.score,
+            topFix: weakest.score.topFix,
+          }
+        : null,
+      counts: { total: all.length, done, open: open.length },
     };
   },
 });

@@ -1,5 +1,6 @@
 import {
   actionErrorMessage,
+  callAction,
   useActionQuery,
 } from "@agent-native/core/client/hooks";
 import {
@@ -9,6 +10,7 @@ import {
 } from "@tabler/icons-react";
 import { useState } from "react";
 import { Link, useParams } from "react-router";
+import { toast } from "sonner";
 
 import { Countdown } from "@/components/podium/Countdown";
 import { DraftPanel } from "@/components/podium/DraftPanel";
@@ -40,12 +42,37 @@ type Selection =
   | { kind: "criterion"; id: string; text: string }
   | null;
 
+// Must match SEED_HACKATHON_ID in server/db/seed.ts. The Reset demo button
+// only shows on the seeded board, and reset-demo only touches that board.
+const SEED_HACKATHON_ID = "00000000-0000-4000-8000-000000000001";
+
 export default function HackathonRoute() {
   const { id } = useParams();
   const hackathonId = id ?? "";
   const query = useActionQuery("get-hackathon", { id: hackathonId });
   const [projectOpen, setProjectOpen] = useState(false);
   const [selection, setSelection] = useState<Selection>(null);
+  const [resetting, setResetting] = useState(false);
+
+  async function resetDemo() {
+    if (
+      !window.confirm(
+        "Reset the demo board to its fresh state? All ticks, scores and the draft on this board will be cleared.",
+      )
+    ) {
+      return;
+    }
+    setResetting(true);
+    try {
+      await callAction("reset-demo", {});
+      await query.refetch();
+      toast.success("Demo board reset. All requirements are open again.");
+    } catch {
+      toast.error("Could not reset the demo board. Try again.");
+    } finally {
+      setResetting(false);
+    }
+  }
 
   if (query.isPending) {
     return (
@@ -177,6 +204,17 @@ export default function HackathonRoute() {
           >
             <IconSparkles className="size-4" aria-hidden /> Draft my submission
           </Button>
+          {hackathonId === SEED_HACKATHON_ID ? (
+            <Button
+              size="sm"
+              variant="ghost"
+              disabled={resetting}
+              onClick={() => void resetDemo()}
+              title="Restore the demo board to its fresh state"
+            >
+              {resetting ? "Resetting…" : "Reset demo"}
+            </Button>
+          ) : null}
         </div>
         {selection ? (
           <p className="mt-3 text-xs text-muted-foreground" role="status">

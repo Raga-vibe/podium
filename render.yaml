@@ -18,6 +18,11 @@ services:
         fromDatabase:
           name: podium-db
           property: connectionString
+      # Auth signing secret. Never commit a real value: set it in the
+      # Render dashboard (generate one with: openssl rand -base64 32).
+      # BETTER_AUTH_URL is inferred automatically.
+      - key: BETTER_AUTH_SECRET
+        sync: false
 databases:
   - name: podium-db
     plan: free

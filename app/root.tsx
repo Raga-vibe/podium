@@ -121,8 +121,14 @@ function AppContent() {
   const navigate = useNavigate();
   const t = useT();
   const location = useLocation();
+  const isLanding = location.pathname === "/";
   const isChatThread = threadIdFromPath(location.pathname) !== null;
   useCommandMenuShortcut(useCallback(() => setCmdkOpen(true), []));
+  // The public landing page renders without the app shell or command menu.
+  // The early return sits after every hook so the hook order never changes.
+  if (isLanding) {
+    return <Outlet />;
+  }
   return (
     <>
       <CommandMenu
@@ -180,6 +186,9 @@ export default function Root() {
   // The path, not the visitor, picks the shell, so the SSR shell stays one
   // cached page per URL.
   const { pathname } = useLocation();
+  // The landing page is public: signed-out visitors must reach it instead of
+  // being sent to sign-in by the session gate.
+  const isLanding = pathname === "/";
   return (
     <AppToolkitProvider>
       <AppProviders
@@ -187,6 +196,7 @@ export default function Root() {
         skeletonLayout={skeletonLayoutForPath(pathname)}
         defaultTheme="dark"
         i18n={{ catalog: i18nCatalog }}
+        isPublicPath={isLanding}
       >
         <DbSyncSetup />
         <AppContent />

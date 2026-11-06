@@ -19,8 +19,14 @@ For custom branding, keep `server/plugins/agent-native-email-branding.ts` aligne
 
 ## Application state
 
-- `navigation` describes the view and selected ids. Chat is `chat` at `/chat` and `/chat/<threadId>`; the Get started page is `home` at `/home`; `/` opens shared sign-in/signup.
+- `navigation` describes the view and selected ids. Chat is `chat` at `/chat` and `/chat/<threadId>`; the Get started page is `home` at `/home`; `/` is the public Podium landing page (signed-in visitors redirect to `/home`); `/sign-in` is the shared sign-in/signup page.
 - Use `navigate` when supported and `view-screen` for a fresh read of visible details; basic navigation is already in `<current-screen>`.
+
+## Environment (this VM, Nov 6 2026)
+
+- The overlay filesystem intermittently fails writes with `EPERM: operation not permitted` (open succeeds, the write fails, leaving 0-byte files). It comes and goes; a write that fails one minute works the next. Never trust a single failed write as proof of a real problem, and never run a write probe against a real file (a failed `writeFile` truncates it first). If a probe truncates a tracked file, restore it with `git --no-optional-locks show HEAD:<path>` (read-only) plus `muse.write`.
+- `muse.write` / `muse.edit` keep working when shell writes fail, so use the file tools for all writes. For read-only git, use `git --no-optional-locks` (plain git tries to refresh the index and fails on the lock write).
+- Dev server: `pnpm dev` can fail at startup two ways from the same flap: Vite config bundling writes a temp file under `node_modules/.vite-temp/`, and React Router typegen writes under `.react-router/types/`. Start with `pnpm exec agent-native dev --configLoader native` (native loader skips the temp file); if typegen still fails, retry with `~/workspace/pwtest/start-dev-retry.sh` until the server stays up. Do not `pkill -f "agent-native dev"` from a shell whose own command line contains that string; run the retry loop from a script file instead.
 
 ## Building a domain app
 
@@ -78,3 +84,8 @@ Tone: direct, encouraging, specific. Never inflate scores or invent deadlines, p
 ### Daily brief job
 
 The daily brief runs as a scheduled automation (Agent Resources path `jobs/daily-brief.md`, schedule `0 7 * * *`, runAs creator) that follows the `daily-brief` skill. Jobs are DB-backed resources in this template, not repo files: create it from Settings > Automations, by asking the agent, or via `resourcePut` — see the `daily-brief` skill for the exact steps. Email sending and Google Calendar OAuth sync are explicitly deferred stretch work: do not attempt them.
+
+### Landing page and engine recommendation
+
+- `/` is a public landing page (`app/components/landing/LandingPage.tsx`, route `app/routes/_index.tsx`). It renders without the app shell: `app/root.tsx` passes `isPublicPath` to `AppProviders` for `/` so the session gate does not redirect signed-out visitors, and skips `AppLayout` there. Signed-in visitors are redirected to `/home` via `useSession`. The hero preview is a static mock board built from the app's own tokens, not a screenshot, so no binary assets are needed.
+- `app/components/layout/EngineRecommendation.tsx` shows one line at the bottom of chat when the active engine is not Builder.io ("Powered by Gemini. Podium is built for Builder.io, switch to Builder.io for the full experience."), linking to Settings > Model. Dismissal is stored in localStorage (`podium.builder-hint.dismissed`).

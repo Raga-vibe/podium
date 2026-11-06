@@ -2,6 +2,8 @@
 
 **Turn any hackathon page into a live mission board, and get coached toward a winning entry.**
 
+Live demo: **https://podium-82hb.onrender.com** · Source: this repo.
+
 Paste a hackathon URL and Podium's agent reads the rules, deadlines, requirements and rubric into a board you and the agent share. You tick things off by hand, the agent scores your project against the rubric, argues with you about the scores, and drafts your submission. Every morning it briefs you on what's left.
 
 ![Podium home: hackathon cards with countdowns and progress](docs/screenshots/home.png)
@@ -26,7 +28,7 @@ pnpm dev
 
 Choose **Continue as local dev** on the welcome screen. No account needed locally.
 
-> Note: in this environment `pnpm` was installed with `npm install -g --prefix ~/.local pnpm@10.29.1` because the VM image ships without corepack. If `pnpm install` fails on the native `node-pty` build, use `pnpm install --ignore-scripts`; only the in-app terminal is affected.
+> If `pnpm install` fails on the native `node-pty` build, use `pnpm install --ignore-scripts`; only the in-app terminal is affected.
 
 Seed the demo board (already seeded on first run):
 
@@ -35,7 +37,7 @@ pnpm action seed-podium
 pnpm action list-hackathons
 ```
 
-Connect an LLM in the app (Use Builder.io, Custom keys, or an `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` in `.env`) so the agent can run the skills. Without a key the board, scoring UI and calendar export still work; the agent buttons will ask you to connect one.
+Connect an LLM in the app (Use Builder.io, Custom keys, or a `GOOGLE_GENERATIVE_AI_API_KEY` / `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` in `.env`) so the agent can run the skills. Without a key the board, scoring UI and calendar export still work; the agent buttons will ask you to connect one. On the hosted app a deployment key covers every visitor, so the agent works with zero setup; the chat shows a small note recommending Builder.io when the active engine is not Builder.io.
 
 Useful checks:
 
@@ -84,7 +86,7 @@ Podium is built on the [Agent-Native framework](https://www.agent-native.com/doc
 ### Reminders
 
 - **Calendar export (ships).** `export-calendar` builds the `.ics` in code. The Timeline panel's **Add to calendar** button downloads it; it imports into Google Calendar, Apple Calendar and Outlook with no sign-in. The agent can call the same action: “put my deadlines in my calendar”.
-- **Daily brief (ships).** A recurring job runs the `daily-brief` skill every morning at the user's chosen time (default 07:00). The brief is saved with `save-brief` and shown as an in-app notification and a **Today** card on Home. Brief on/off and time live in the Today card's Brief settings. Jobs are DB-backed Agent Resources, not repo files — create the job in Settings › Automations (Scheduled, `0 7 * * *`), or ask the agent: “Create a scheduled task that runs the Podium daily-brief skill every morning at 7.”
+- **Daily brief (ships).** Create a recurring job that runs the `daily-brief` skill every morning at the user's chosen time (default 07:00). The brief is saved with `save-brief` and shown as an in-app notification and a **Today** card on Home. Brief on/off and time live in the Today card's Brief settings. Jobs are DB-backed Agent Resources, not repo files — create the job in Settings › Automations (Scheduled, `0 7 * * *`), or ask the agent: “Create a scheduled task that runs the Podium daily-brief skill every morning at 7.”
 - **Email / Google Calendar sync (stretch, deferred).** Not shipped. The daily brief is in-app only; live Google Calendar sync through OAuth was deliberately left out until the demo flow is flawless.
 
 ## Built during the hackathon
@@ -92,5 +94,5 @@ Podium is built on the [Agent-Native framework](https://www.agent-native.com/doc
 Podium started from the **Agent-Native Chat template** on **November 5, 2026** (scaffolded with `npx --yes @agent-native/core@latest create podium --standalone --template chat`, `@agent-native/core@0.224.0`), and was built during the Builder.io Agent-Native Hackathon.
 
 - **Libraries used:** Agent-Native Core / AgentKit / Toolkit 0.224.0, React 19, React Router 8, Drizzle ORM, zod, Tailwind CSS v4, Radix/shadcn UI, TanStack Query, Sonner, Tabler Icons. No LLM SDK is imported in `actions/` or `app/` — the agent does all reasoning through the framework.
-- **Built new for Podium:** the 8-table Postgres schema + migration, all 22 actions, the 4 skills, the AGENTS.md Podium section, the Home page (import bar, Today card, hackathon cards with countdowns and progress rings), the hackathon page (mission board with drag reorder and inline edit, rubric coach, timeline, project drawer, submission draft), calendar export, daily-brief settings and job, dark-first theme with a single amber accent, and this README.
+- **Built new for Podium:** the 8-table Postgres schema + migration, all 22 actions, the 4 skills, the AGENTS.md Podium section, the public landing page at `/`, the Home page (import bar, Today card, hackathon cards with countdowns and progress rings), the hackathon page (mission board with drag reorder and inline edit, rubric coach, timeline, project drawer, submission draft), calendar export, daily-brief settings and job, the chat-footer engine recommendation, dark-first theme with a single amber accent, and this README.
 - **Kept from the template:** the chat shell, AgentSidebar, auth, live sync, application state, and the `hello` / `navigate` / `view-screen` framework actions (with `view-screen` extended for Podium's navigation and selection).

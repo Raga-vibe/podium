@@ -8,7 +8,7 @@ services:
     env: node
     repo: https://github.com/Raga-vibe/podium
     branch: main
-    buildCommand: corepack enable && pnpm install --ignore-scripts && pnpm build
+    buildCommand: pnpm install --ignore-scripts && pnpm build
     preDeployCommand: pnpm migrate:production
     startCommand: pnpm start
     envVars:

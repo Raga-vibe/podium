@@ -1,0 +1,26 @@
+# Render Blueprint for Podium (Builder.io Agent-Native Hackathon entry).
+# Connect this repo in the Render dashboard and apply this file, or push it
+# to GitHub and use "New + Blueprint". Fill in ANTHROPIC_API_KEY (or
+# OPENAI_API_KEY) in the dashboard after the first deploy; the agent buttons
+# ask for a key until one is set.
+services:
+  - type: web
+    name: podium
+    env: node
+    repo: https://github.com/Raga-vibe/podium
+    branch: main
+    buildCommand: corepack enable && pnpm install --ignore-scripts && pnpm build
+    preDeployCommand: pnpm migrate:production
+    startCommand: pnpm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: podium-db
+          property: connectionString
+      - key: ANTHROPIC_API_KEY
+        sync: false
+databases:
+  - name: podium-db
+    plan: free

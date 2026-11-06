@@ -30,6 +30,7 @@ import {
   askAgent,
   formatInZone,
   formatLocal,
+  sameHackathonUrl,
   weakestCriterion,
 } from "@/lib/podium";
 
@@ -205,7 +206,7 @@ export default function HackathonRoute() {
           >
             <IconSparkles className="size-4" aria-hidden /> Draft my submission
           </Button>
-          {hackathon.url === SEED_HACKATHON_URL ? (
+          {sameHackathonUrl(hackathon.url, SEED_HACKATHON_URL) ? (
             <Button
               size="sm"
               variant="ghost"

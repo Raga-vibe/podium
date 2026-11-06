@@ -199,6 +199,22 @@ export function scoreOf(scores: Score[], criterionId: string): Score | undefined
   return scores.find((s) => s.criterionId === criterionId);
 }
 
+/**
+ * Compare hackathon URLs ignoring scheme, a leading www., casing and a
+ * trailing slash, so the demo board is recognised whatever exact form its
+ * stored URL has (https://builder.io/hackathon vs https://www.builder.io/hackathon/).
+ */
+export function sameHackathonUrl(a: string, b: string): boolean {
+  const normalize = (value: string) =>
+    value
+      .trim()
+      .toLowerCase()
+      .replace(/^https?:\/\//, "")
+      .replace(/^www\./, "")
+      .replace(/\/+$/, "");
+  return normalize(a) === normalize(b);
+}
+
 export function weakestCriterion(
   criteria: RubricCriterion[],
   scores: Score[],

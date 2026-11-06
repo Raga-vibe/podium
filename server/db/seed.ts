@@ -25,6 +25,18 @@ export const SEED_HACKATHON_ID = "00000000-0000-4000-8000-000000000001";
 /** The hackathon page the demo board comes from. Its url is unique, so it identifies the demo board on any database. */
 export const SEED_HACKATHON_URL = "https://www.builder.io/hackathon";
 
+/** Compare hackathon URLs ignoring scheme, a leading www., casing and a trailing slash. */
+function sameHackathonUrl(a: string, b: string): boolean {
+  const normalize = (value: string) =>
+    value
+      .trim()
+      .toLowerCase()
+      .replace(/^https?:\/\//, "")
+      .replace(/^www\./, "")
+      .replace(/\/+$/, "");
+  return normalize(a) === normalize(b);
+}
+
 const DEADLINE = "2026-11-10T07:59:00Z";
 
 const SEED_REQUIREMENTS: Array<{
@@ -182,11 +194,8 @@ export async function seedBuilderHackathon(): Promise<{
  */
 export async function resetSeededHackathon(): Promise<{ hackathonId: string }> {
   const db = getDb();
-  const [found] = await db
-    .select({ id: hackathons.id })
-    .from(hackathons)
-    .where(eq(hackathons.url, SEED_HACKATHON_URL))
-    .limit(1);
+  const all = await db.select({ id: hackathons.id, url: hackathons.url }).from(hackathons);
+  const found = all.find((h) => sameHackathonUrl(h.url, SEED_HACKATHON_URL));
   if (!found) {
     const seeded = await seedBuilderHackathon();
     return { hackathonId: seeded.hackathonId ?? SEED_HACKATHON_ID };

@@ -1,0 +1,225 @@
+import type {
+  briefs,
+  drafts,
+  hackathons,
+  milestones,
+  projects,
+  requirements,
+  rubricCriteria,
+  scores,
+} from "./schema.js";
+
+export type HackathonRow = typeof hackathons.$inferSelect;
+export type RequirementRow = typeof requirements.$inferSelect;
+export type MilestoneRow = typeof milestones.$inferSelect;
+export type RubricRow = typeof rubricCriteria.$inferSelect;
+export type ProjectRow = typeof projects.$inferSelect;
+export type ScoreRow = typeof scores.$inferSelect;
+export type DraftRow = typeof drafts.$inferSelect;
+export type BriefRow = typeof briefs.$inferSelect;
+
+export function iso(d: Date | null | undefined): string | null {
+  return d ? d.toISOString() : null;
+}
+
+export function serializeHackathon(r: HackathonRow) {
+  return {
+    id: r.id,
+    name: r.name,
+    url: r.url,
+    organizer: r.organizer,
+    organizerTimezone: r.organizerTimezone,
+    submissionDeadline: iso(r.submissionDeadline),
+    prizeSummary: r.prizeSummary,
+    createdAt: iso(r.createdAt),
+  };
+}
+
+export function serializeRequirement(r: RequirementRow) {
+  return {
+    id: r.id,
+    hackathonId: r.hackathonId,
+    title: r.title,
+    detail: r.detail,
+    category: r.category,
+    done: r.done,
+    source: r.source,
+    status: r.status,
+    order: r.order,
+  };
+}
+
+export function serializeMilestone(r: MilestoneRow) {
+  return {
+    id: r.id,
+    hackathonId: r.hackathonId,
+    label: r.label,
+    at: iso(r.at),
+  };
+}
+
+export function serializeRubric(r: RubricRow) {
+  return {
+    id: r.id,
+    hackathonId: r.hackathonId,
+    name: r.name,
+    weight: r.weight,
+    description: r.description,
+  };
+}
+
+export function serializeProject(r: ProjectRow) {
+  return {
+    id: r.id,
+    hackathonId: r.hackathonId,
+    name: r.name,
+    pitch: r.pitch,
+    repoUrl: r.repoUrl,
+    demoUrl: r.demoUrl,
+  };
+}
+
+export function serializeScore(r: ScoreRow) {
+  return {
+    id: r.id,
+    hackathonId: r.hackathonId,
+    criterionId: r.criterionId,
+    score: r.score,
+    rationale: r.rationale,
+    topFix: r.topFix,
+    userNote: r.userNote,
+    createdAt: iso(r.createdAt),
+  };
+}
+
+export function serializeDraft(r: DraftRow) {
+  return {
+    id: r.id,
+    hackathonId: r.hackathonId,
+    body: r.body,
+    updatedAt: iso(r.updatedAt),
+  };
+}
+
+export function serializeBrief(
+  r: BriefRow,
+  hackathonName: string | null,
+) {
+  return {
+    id: r.id,
+    hackathonId: r.hackathonId,
+    hackathonName,
+    body: r.body,
+    createdAt: iso(r.createdAt),
+  };
+}
+
+/** Weighted total on a 0-10 scale, rounded to 1 decimal; null when no scores. */
+export function weightedTotal(
+  scored: Array<{ criterionId: string; score: number }>,
+  criteria: Array<{ id: string; weight: number }>,
+): number | null {
+  const weights = new Map(criteria.map((c) => [c.id, c.weight]));
+  let weightedSum = 0;
+  let weightSum = 0;
+  for (const s of scored) {
+    const w = weights.get(s.criterionId);
+    if (w === undefined) continue;
+    weightedSum += s.score * w;
+    weightSum += w;
+  }
+  if (weightSum === 0) return null;
+  return Math.round((weightedSum / weightSum) * 10) / 10;
+}
+
+/** Latest score per criterion (newest createdAt wins). */
+export function latestScores(rows: ScoreRow[]): ScoreRow[] {
+  const byCriterion = new Map<string, ScoreRow>();
+  const sorted = [...rows].sort(
+    (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+  );
+  for (const row of sorted) byCriterion.set(row.criterionId, row);
+  return [...byCriterion.values()];
+}
+
+export function slugify(name: string): string {
+  const slug = name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return slug || "hackathon";
+}
+
+function pad(n: number): string {
+  return String(n).padStart(2, "0");
+}
+
+/** Format a Date as UTC `YYYYMMDDTHHMMSSZ` for ICS. */
+export function formatIcsDate(d: Date): string {
+  return `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`;
+}
+
+/** Escape text per RFC 5545. */
+export function escapeIcsText(value: string): string {
+  return value
+    .replace(/\\/g, "\\\\")
+    .replace(/;/g, "\\;")
+    .replace(/,/g, "\\,")
+    .replace(/\r\n|\r|\n/g, "\\n");
+}
+
+/** Fold a line at 75 octets per RFC 5545 (continuation lines start with a space). */
+export function foldIcsLine(line: string): string {
+  if (line.length <= 75) return line;
+  const chunks: string[] = [];
+  let rest = line;
+  chunks.push(rest.slice(0, 75));
+  rest = rest.slice(75);
+  while (rest.length > 0) {
+    chunks.push(` ${rest.slice(0, 74)}`);
+    rest = rest.slice(74);
+  }
+  return chunks.join("\r\n");
+}
+
+export interface IcsEventInput {
+  uid: string;
+  start: Date;
+  end: Date;
+  summary: string;
+  description: string;
+}
+
+export function buildIcs(events: IcsEventInput[], now: Date): string {
+  const lines: string[] = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//Podium//Hackathon Deadlines//EN",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+  ];
+  for (const e of events) {
+    lines.push(
+      "BEGIN:VEVENT",
+      `UID:${e.uid}`,
+      `DTSTAMP:${formatIcsDate(now)}`,
+      `DTSTART:${formatIcsDate(e.start)}`,
+      `DTEND:${formatIcsDate(e.end)}`,
+      `SUMMARY:${escapeIcsText(e.summary)}`,
+      `DESCRIPTION:${escapeIcsText(e.description)}`,
+      "BEGIN:VALARM",
+      "TRIGGER:-PT24H",
+      "ACTION:DISPLAY",
+      `DESCRIPTION:${escapeIcsText(e.summary)}`,
+      "END:VALARM",
+      "BEGIN:VALARM",
+      "TRIGGER:-PT2H",
+      "ACTION:DISPLAY",
+      `DESCRIPTION:${escapeIcsText(e.summary)}`,
+      "END:VALARM",
+      "END:VEVENT",
+    );
+  }
+  lines.push("END:VCALENDAR");
+  return lines.map(foldIcsLine).join("\r\n") + "\r\n";
+}

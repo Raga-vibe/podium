@@ -7,7 +7,7 @@ import {
   IconSparkles,
   IconTrophy,
 } from "@tabler/icons-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, Navigate } from "react-router";
 
 import { Button } from "@/components/ui/button";
@@ -77,12 +77,32 @@ function MockBoard() {
 }
 
 /**
+ * True once the image at src has loaded. A missing image (404) never renders
+ * a broken-image icon: callers show their fallback until the image proves
+ * it exists.
+ */
+function useImageReady(src: string) {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const img = new Image();
+    img.onload = () => setReady(true);
+    img.onerror = () => setReady(false);
+    img.src = src;
+    return () => {
+      img.onload = null;
+      img.onerror = null;
+    };
+  }, [src]);
+  return ready;
+}
+
+/**
  * Hero preview: the real mission board screenshot, framed in a browser
  * window. Falls back to the mock board while /board.png is missing (the
  * image is a binary asset, so it is uploaded to public/ on GitHub web).
  */
 function BoardPreview() {
-  const [failed, setFailed] = useState(false);
+  const ready = useImageReady("/board.png");
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-card text-left shadow-2xl shadow-black/40">
       <div className="flex items-center gap-2 border-b border-border px-4 py-3">
@@ -93,17 +113,16 @@ function BoardPreview() {
           podium-82hb.onrender.com
         </span>
       </div>
-      {failed ? (
-        <MockBoard />
-      ) : (
+      {ready ? (
         <img
           src="/board.png"
           alt="Podium mission board for the Builder.io Agent-Native Hackathon, showing the requirements, progress, rubric score and timeline"
           width={1280}
           height={900}
           className="block h-auto w-full"
-          onError={() => setFailed(true)}
         />
+      ) : (
+        <MockBoard />
       )}
     </div>
   );
@@ -111,8 +130,8 @@ function BoardPreview() {
 
 /** Second screenshot, hidden entirely while /home.png is missing. */
 function HomeShot() {
-  const [failed, setFailed] = useState(false);
-  if (failed) return null;
+  const ready = useImageReady("/home.png");
+  if (!ready) return null;
   return (
     <figure className="mt-8 overflow-hidden rounded-2xl border border-border bg-card shadow-xl shadow-black/30">
       <img
@@ -122,7 +141,6 @@ function HomeShot() {
         width={1280}
         height={900}
         className="block h-auto w-full"
-        onError={() => setFailed(true)}
       />
       <figcaption className="border-t border-border px-4 py-3 text-sm text-muted-foreground">
         Your hackathons at a glance: progress, deadlines, and the morning

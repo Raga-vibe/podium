@@ -72,7 +72,7 @@ Tone: direct, encouraging, specific. Never inflate scores or invent deadlines, p
 - `save-brief` / `get-briefs` — daily briefs.
 - `get-brief-settings` / `save-brief-settings` — daily brief on/off and time (HH:MM).
 - `seed-podium` — idempotent seed of the Builder.io Agent-Native Hackathon (fixed id, see `server/db/seed.ts`).
-- `reset-demo` — restore the seeded demo board to its fresh state; only that board is touched.
+- `reset-demo` — restore the demo board to its fresh state (requirements open and accepted, scores/draft/briefs cleared, project restored to Podium). Finds the board by its hackathon URL, so it works on the live database whose board predates the fixed seed id; the board's own requirements are kept.
 - `view-screen` — current navigation, plus the on-screen hackathon summary.
 
 ### Skills (.agents/skills/)

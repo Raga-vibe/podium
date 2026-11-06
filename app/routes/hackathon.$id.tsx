@@ -42,9 +42,10 @@ type Selection =
   | { kind: "criterion"; id: string; text: string }
   | null;
 
-// Must match SEED_HACKATHON_ID in server/db/seed.ts. The Reset demo button
-// only shows on the seeded board, and reset-demo only touches that board.
-const SEED_HACKATHON_ID = "00000000-0000-4000-8000-000000000001";
+// The demo board is the one for the Builder.io hackathon page. Its url is
+// unique, so this identifies it on any database (the live board predates
+// the fixed seed id). Must match SEED_HACKATHON_URL in server/db/seed.ts.
+const SEED_HACKATHON_URL = "https://www.builder.io/hackathon";
 
 export default function HackathonRoute() {
   const { id } = useParams();
@@ -204,7 +205,7 @@ export default function HackathonRoute() {
           >
             <IconSparkles className="size-4" aria-hidden /> Draft my submission
           </Button>
-          {hackathonId === SEED_HACKATHON_ID ? (
+          {hackathon.url === SEED_HACKATHON_URL ? (
             <Button
               size="sm"
               variant="ghost"

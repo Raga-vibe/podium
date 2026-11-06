@@ -82,6 +82,7 @@ import { useLocation, useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { EngineRecommendation } from "@/components/layout/EngineRecommendation";
 import {
   Tooltip,
   TooltipContent,
@@ -1078,6 +1079,7 @@ function ChatAgentFooter({ children }: { children: ReactNode }) {
         </div>
       ) : null}
       {planReady ? <PlanModeCallout onImplementPlan={implementPlan} /> : null}
+      <EngineRecommendation />
       {children}
     </div>
   );

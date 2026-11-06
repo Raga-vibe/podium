@@ -8,6 +8,8 @@ import { useLocation, useNavigate } from "react-router";
 import { chatThreadPath } from "@/lib/chat-paths";
 import { TAB_ID } from "@/lib/tab-id";
 
+import { EngineRecommendation } from "./EngineRecommendation";
+
 interface AgentInspectorProps {
   children: ReactNode;
   chatHomeHandoffActive: boolean;
@@ -62,6 +64,7 @@ export function AgentInspector({
       onFullscreenRequest={openAskAgentFullscreen}
       emptyStateText={t("chat.inspectEmptyState")}
       agentPageHref="/settings/agent"
+      threadFooterSlot={<EngineRecommendation />}
       suggestions={suggestionsForPath(pathname)}
     >
       {children}

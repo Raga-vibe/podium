@@ -190,8 +190,8 @@ const FEATURES = [
     body: "You and the agent read and write the same data. Whatever you tick, the agent sees. Whatever the agent drafts, you see.",
   },
   {
-    title: "Works for every visitor",
-    body: "Runs on Builder.io for the team, with a Gemini fallback so anyone can open the app and use the agent with zero setup.",
+    title: "Builder.io first, Gemini fallback",
+    body: "Runs on Builder.io for the team, with a Gemini fallback so the agent keeps working.",
   },
 ];
 
@@ -245,22 +245,17 @@ export default function LandingPage() {
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <Button size="lg" asChild className="bg-amber-400 font-semibold text-zinc-950 hover:bg-amber-300">
-                  <a href="/guest">
-                    Try the demo <IconArrowRight className="size-4" aria-hidden />
-                  </a>
+                  <Link to="/home">
+                    Get started <IconArrowRight className="size-4" aria-hidden />
+                  </Link>
                 </Button>
                 <Button size="lg" variant="outline" asChild>
-                  <a href="#how-it-works">See how it works</a>
+                  <a href={REPO_URL} target="_blank" rel="noreferrer">
+                    View on GitHub
+                  </a>
                 </Button>
               </div>
               <p className="mt-4 text-sm text-muted-foreground">
-                One click, no sign-up: try the demo board as a guest. The
-                agent just works.{" "}
-                <Link to="/home" className="font-medium text-foreground underline underline-offset-2">
-                  Create your own board
-                </Link>
-              </p>
-              <p className="mt-2 text-sm text-muted-foreground">
                 Live now at{" "}
                 <a href={LIVE_URL} className="font-medium text-foreground underline underline-offset-2">
                   podium-82hb.onrender.com
@@ -305,17 +300,17 @@ export default function LandingPage() {
                 Your next deadline is closer than you think.
               </h2>
               <p className="mt-2 max-w-xl text-muted-foreground">
-                Podium is itself a hackathon entry. Try the demo board for the{" "}
+                Podium is itself a hackathon entry. It was built for the{" "}
                 <a href={HACKATHON_URL} target="_blank" rel="noreferrer" className="font-medium text-foreground underline underline-offset-2">
                   Builder.io Agent-Native Hackathon
                 </a>
-                , then use it for yours. No email, no sign-up.
+                , and it works for yours too.
               </p>
             </div>
             <Button size="lg" asChild className="shrink-0 bg-amber-400 font-semibold text-zinc-950 hover:bg-amber-300">
-              <a href="/guest">
-                Try the demo <IconArrowRight className="size-4" aria-hidden />
-              </a>
+              <Link to="/home">
+                Get started <IconArrowRight className="size-4" aria-hidden />
+              </Link>
             </Button>
           </div>
         </section>

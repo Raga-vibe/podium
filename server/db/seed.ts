@@ -1,4 +1,3 @@
-import { appStateGet, appStatePut } from "@agent-native/core/application-state";
 import { eq } from "drizzle-orm";
 
 import { getDb } from "./index.js";
@@ -193,8 +192,7 @@ export async function seedBuilderHackathon(): Promise<{
  * Podium and the rubric is restored to the official judging criteria.
  * Milestones are the hackathon's facts, so they stay. If the board has no
  * requirements at all, the seed set is inserted instead. Other hackathons
- * are never touched. The reset time is stamped so guest entry can throttle
- * its automatic reset.
+ * are never touched.
  */
 export async function resetSeededHackathon(): Promise<{ hackathonId: string }> {
   const db = getDb();
@@ -202,7 +200,6 @@ export async function resetSeededHackathon(): Promise<{ hackathonId: string }> {
   const found = all.find((h) => sameHackathonUrl(h.url, SEED_HACKATHON_URL));
   if (!found) {
     const seeded = await seedBuilderHackathon();
-    await stampDemoBoardReset();
     return { hackathonId: seeded.hackathonId ?? SEED_HACKATHON_ID };
   }
   const hackathonId = found.id;
@@ -234,36 +231,5 @@ export async function resetSeededHackathon(): Promise<{ hackathonId: string }> {
     await tx.delete(rubricCriteria).where(eq(rubricCriteria.hackathonId, hackathonId));
     await insertRubric(tx, hackathonId);
   });
-  await stampDemoBoardReset();
   return { hackathonId };
-}
-
-/**
- * The demo board's last reset, kept in the framework's app-state store under
- * the demo account's email (the framework keys app-state by user email).
- * Guests share the demo account, so this one timestamp is shared by every
- * guest entry. A missing or unreadable value means "never reset".
- */
-const DEMO_APP_STATE_SESSION_ID = "demo@podium.app";
-const DEMO_LAST_RESET_KEY = "demo-board-last-reset";
-
-export async function getDemoBoardLastReset(): Promise<Date | null> {
-  try {
-    const value = await appStateGet(DEMO_APP_STATE_SESSION_ID, DEMO_LAST_RESET_KEY);
-    const at = typeof value?.at === "string" ? new Date(value.at) : null;
-    return at && !Number.isNaN(at.getTime()) ? at : null;
-  } catch {
-    return null;
-  }
-}
-
-/** Record that the demo board was just reset. A failed stamp never fails the reset itself. */
-export async function stampDemoBoardReset(): Promise<void> {
-  try {
-    await appStatePut(DEMO_APP_STATE_SESSION_ID, DEMO_LAST_RESET_KEY, {
-      at: new Date().toISOString(),
-    });
-  } catch (error) {
-    console.error("Could not stamp the demo board reset time", error);
-  }
 }

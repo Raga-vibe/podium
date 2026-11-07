@@ -4,7 +4,7 @@
 
 Live demo: **https://podium-82hb.onrender.com** · Source: this repo.
 
-Try it with one click as a guest: hit **Try the demo** on the landing page, no email or sign-up. Guests land on a fresh demo board with the agent ready; if the board was last reset more than 10 minutes ago, guest entry resets it first, so one judge's ticks, scores and drafts never carry over to the next. **Reset demo** on the board restores it to its fresh state at any time.
+Sign up on the landing page to try it: the seeded Builder.io board is ready with the agent, and **Reset demo** on the board restores it to its fresh state at any time.
 
 Paste a hackathon URL and Podium's agent reads the rules, deadlines, requirements and rubric into a board you and the agent share. You tick things off by hand, the agent scores your project against the rubric, argues with you about the scores, and drafts your submission. Every morning it briefs you on what's left.
 
@@ -39,7 +39,7 @@ pnpm action seed-podium
 pnpm action list-hackathons
 ```
 
-Connect an LLM in the app (Use Builder.io, Custom keys, or a `GOOGLE_GENERATIVE_AI_API_KEY` / `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` in `.env`) so the agent can run the skills. Without a key the board, scoring UI and calendar export still work; the agent buttons will ask you to connect one. On the hosted app a deployment key covers every visitor, so the agent works with zero setup; the chat shows a small note recommending Builder.io when the active engine is not Builder.io.
+Connect an LLM in the app (Use Builder.io, Custom keys, or a `GOOGLE_GENERATIVE_AI_API_KEY` / `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` in `.env`) so the agent can run the skills. Without a key the board, scoring UI and calendar export still work; the agent buttons will ask you to connect one. On the hosted app a deployment key covers signed-in users, so the agent works without each person adding a key; the chat shows a small note recommending Builder.io when the active engine is not Builder.io.
 
 Useful checks:
 
@@ -96,5 +96,5 @@ Podium is built on the [Agent-Native framework](https://www.agent-native.com/doc
 Podium started from the **Agent-Native Chat template** on **November 5, 2026** (scaffolded with `npx --yes @agent-native/core@latest create podium --standalone --template chat`, `@agent-native/core@0.224.0`), and was built during the Builder.io Agent-Native Hackathon.
 
 - **Libraries used:** Agent-Native Core / AgentKit / Toolkit 0.224.0, React 19, React Router 8, Drizzle ORM, zod, Tailwind CSS v4, Radix/shadcn UI, TanStack Query, Sonner, Tabler Icons. No LLM SDK is imported in `actions/` or `app/` — the agent does all reasoning through the framework.
-- **Built new for Podium:** the 8-table Postgres schema + migration, all 23 actions, the 4 skills, the AGENTS.md Podium section, the public landing page at `/` (real board screenshot in the hero, one-click guest access), the Home page (import bar, Today card, hackathon cards with countdowns and progress rings), the hackathon page (mission board with drag reorder and inline edit, rubric coach, timeline, project drawer, submission draft, Reset demo), calendar export, daily-brief settings and job, the chat-footer engine recommendation, dark-first theme with a single amber accent, and this README.
+- **Built new for Podium:** the 8-table Postgres schema + migration, all 23 actions, the 4 skills, the AGENTS.md Podium section, the public landing page at `/` (real board screenshot in the hero), the Home page (import bar, Today card, hackathon cards with countdowns and progress rings), the hackathon page (mission board with drag reorder and inline edit, rubric coach, timeline, project drawer, submission draft, Reset demo), calendar export, daily-brief settings and job, the chat-footer engine recommendation, dark-first theme with a single amber accent, and this README.
 - **Kept from the template:** the chat shell, AgentSidebar, auth, live sync, application state, and the `hello` / `navigate` / `view-screen` framework actions (with `view-screen` extended for Podium's navigation and selection).

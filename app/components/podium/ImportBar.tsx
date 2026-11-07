@@ -7,6 +7,10 @@ import { askAgent } from "@/lib/podium";
 /** The OpenServ SERV Hackathon 02 page, offered as a one-click try-it import. */
 const OPENSERV_HACKATHON_URL = "https://www.openserv.ai/hackathon-2";
 
+/** The Nous Research Hermes Agent Plugin Hackathon announcement on X. */
+const HERMES_HACKATHON_URL =
+  "https://x.com/nousresearch/status/2118094256438936062";
+
 /**
  * Paste a hackathon URL. The UI never fetches or interprets the page itself:
  * it asks the agent to run rules-extraction, which calls fetch-hackathon-page
@@ -22,6 +26,15 @@ export function ImportBar() {
     askAgent(
       `Import this hackathon page into Podium using the rules-extraction skill: ${OPENSERV_HACKATHON_URL}. Extract the rules, deadlines, requirements, rubric and prizes, then save the hackathon.`,
       { url: OPENSERV_HACKATHON_URL, skill: "rules-extraction" },
+    );
+    setSent(true);
+  }
+
+  function tryHermes() {
+    setError(null);
+    askAgent(
+      `Import this hackathon announcement into Podium using the rules-extraction skill: ${HERMES_HACKATHON_URL}. Extract the rules, deadlines, requirements, rubric and prizes, then save the hackathon.`,
+      { url: HERMES_HACKATHON_URL, skill: "rules-extraction" },
     );
     setSent(true);
   }
@@ -91,6 +104,14 @@ export function ImportBar() {
             onClick={tryOpenserv}
           >
             OpenServ Hackathon 02
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={tryHermes}
+          >
+            Hermes Plugin Hackathon
           </Button>
           <span>
             or paste{" "}

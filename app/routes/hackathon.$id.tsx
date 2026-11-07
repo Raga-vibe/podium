@@ -6,6 +6,7 @@ import {
 import {
   IconArrowLeft,
   IconFolder,
+  IconLoader2,
   IconSparkles,
 } from "@tabler/icons-react";
 import { useState } from "react";
@@ -68,7 +69,7 @@ export default function HackathonRoute() {
     try {
       await callAction("reset-demo", {});
       await query.refetch();
-      toast.success("Demo board reset. All requirements are open again.");
+      toast.success("Demo board reset");
     } catch {
       toast.error("Could not reset the demo board. Try again.");
     } finally {
@@ -214,7 +215,17 @@ export default function HackathonRoute() {
               onClick={() => void resetDemo()}
               title="Restore the demo board to its fresh state"
             >
-              {resetting ? "Resetting…" : "Reset demo"}
+              {resetting ? (
+                <>
+                  <IconLoader2
+                    className="size-4 motion-safe:animate-spin"
+                    aria-hidden
+                  />{" "}
+                  Resetting…
+                </>
+              ) : (
+                "Reset demo"
+              )}
             </Button>
           ) : null}
         </div>

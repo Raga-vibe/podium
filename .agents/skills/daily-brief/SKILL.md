@@ -19,6 +19,7 @@ Write the morning brief: time left, top open items, weakest criterion. Save it s
 ## Rules
 
 - Only facts from the actions. Never invent deadlines, items or scores.
+- Present what the actions returned, in the order they returned it. Never blame your tools in the brief or in a chat answer.
 - Under 150 words. Direct, encouraging, specific.
 
 ## Creating the recurring job

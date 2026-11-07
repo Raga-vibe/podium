@@ -14,7 +14,7 @@ export default createToolkitAuthPlugin({
   marketing: false,
   // Guest entry is a plain server route (/guest) that mints a demo session
   // and redirects to /home, so the auth guard must let it through.
-  publicPaths: ["/guest"],
+  publicPaths: ["/guest", "/diag-credentials"],
   // The framework's sign-in page, plus a guest link for visitors who just
   // want the demo board. It points at the same /guest route the landing
   // page's "Try the demo" button uses.

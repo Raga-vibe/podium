@@ -158,6 +158,28 @@ export function weakestCriterion(
   return weakest;
 }
 
+/**
+ * Board order for requirements: Build, Demo, Submission, Eligibility
+ * (REQUIREMENT_CATEGORIES in app/lib/podium.ts), then the board order
+ * within the group. The stored `order` alone is not the board order: it is
+ * a global sequence from import time. Returns a new array.
+ */
+export function sortRequirementsByBoardOrder<T extends { category: string; order: number }>(
+  rows: T[],
+): T[] {
+  const CATEGORY_RANK: Record<string, number> = {
+    build: 0,
+    demo: 1,
+    submission: 2,
+    eligibility: 3,
+  };
+  return [...rows].sort(
+    (a, b) =>
+      (CATEGORY_RANK[a.category] ?? 99) - (CATEGORY_RANK[b.category] ?? 99) ||
+      a.order - b.order,
+  );
+}
+
 export function slugify(name: string): string {
   const slug = name
     .toLowerCase()

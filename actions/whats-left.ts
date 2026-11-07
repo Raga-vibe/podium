@@ -5,6 +5,7 @@ import { getDb } from "../server/db/index.js";
 import {
   latestScores,
   serializeRequirement,
+  sortRequirementsByBoardOrder,
   weakestCriterion,
 } from "../server/db/podium.js";
 import { hackathons, requirements, rubricCriteria, scores } from "../server/db/schema.js";
@@ -21,7 +22,7 @@ export default defineAction({
     open: z
       .array(requirementOutputSchema)
       .describe(
-        "Open requirements in board order, whatever their status. Each item includes its status (proposed or accepted), so items still waiting for approval can be mentioned.",
+        "Open requirements in board order: Build, then Demo, then Submission, then Eligibility; within a group, in board order. Each item includes its status (proposed or accepted), so items still waiting for approval can be mentioned.",
       ),
     deadline: z.string().nullable().describe("Submission deadline as an ISO string, or null"),
     timeLeft: z
@@ -71,7 +72,8 @@ export default defineAction({
     ]);
     // Open means not done, whatever the status: this is the same count the
     // board shows (list-hackathons openCount), so the two can never disagree.
-    const open = all.filter((r) => !r.done);
+    // Order is the board's order (see sortRequirementsByBoardOrder).
+    const open = sortRequirementsByBoardOrder(all.filter((r) => !r.done));
     const done = all.length - open.length;
     const weakest = weakestCriterion(rubric, latestScores(scoreRows));
     let timeLeft: { days: number; hours: number } | null = null;

@@ -186,13 +186,7 @@ export function formatInZone(iso: string | null, timeZone: string | null): strin
 
 export function formatDay(iso: string | null): string {
   if (!iso) return "";
-  return new Intl.DateTimeFormat(undefined, {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-    timeZoneName: "short",
-  }).format(new Date(iso));
+  return formatLocal(iso);
 }
 
 /** Ask the agent to do AI work, with the relevant ids as context. */

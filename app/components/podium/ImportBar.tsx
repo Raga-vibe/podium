@@ -79,9 +79,10 @@ export function ImportBar() {
         />
         <Button
           type="submit"
-          className="h-11 bg-amber-400 px-5 font-semibold text-zinc-950 hover:bg-amber-300"
+          disabled={sent}
+          className="h-11 bg-amber-400 px-5 font-semibold text-zinc-950 hover:bg-amber-300 disabled:opacity-60"
         >
-          Import hackathon
+          {sent ? "Import sent…" : "Import hackathon"}
         </Button>
       </form>
       {error ? (

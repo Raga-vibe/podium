@@ -184,6 +184,7 @@ function RequirementRow({
                 size="sm"
                 variant="outline"
                 className="h-6 px-2 text-xs"
+                disabled={accept.isPending}
                 onClick={(event) => {
                   event.stopPropagation();
                   accept.mutate(
@@ -201,6 +202,7 @@ function RequirementRow({
                 size="sm"
                 variant="ghost"
                 className="h-6 px-2 text-xs"
+                disabled={accept.isPending}
                 onClick={(event) => {
                   event.stopPropagation();
                   accept.mutate(
@@ -223,6 +225,7 @@ function RequirementRow({
           size="sm"
           variant="ghost"
           className="h-6 w-6 p-0"
+          disabled={reorder.isPending}
           onClick={(event) => {
             event.stopPropagation();
             move(-1);
@@ -235,6 +238,7 @@ function RequirementRow({
           size="sm"
           variant="ghost"
           className="h-6 w-6 p-0"
+          disabled={reorder.isPending}
           onClick={(event) => {
             event.stopPropagation();
             move(1);
@@ -248,8 +252,10 @@ function RequirementRow({
         size="sm"
         variant="ghost"
         className="h-7 w-7 shrink-0 p-0 text-muted-foreground hover:text-red-400"
+        disabled={remove.isPending}
         onClick={(event) => {
           event.stopPropagation();
+          if (!window.confirm(`Delete "${requirement.title}"? This cannot be undone.`)) return;
           remove.mutate(
             { id: requirement.id },
             {

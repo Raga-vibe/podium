@@ -122,7 +122,9 @@ function pathForView(view?: string): string {
   }
 }
 
-export function pathForCommand(command: any): string {
+export function pathForCommand(
+  command: { view?: string; hackathonId?: string; threadId?: string } | null | undefined,
+): string {
   if (command?.view === "hackathon" && typeof command?.hackathonId === "string") {
     return `/hackathon/${command.hackathonId}`;
   }

@@ -4,7 +4,7 @@
 
 Live demo: **https://podium-82hb.onrender.com** · Source: this repo.
 
-Sign up on the landing page to try it: your own Builder.io starter board is waiting with the agent, and **Reset demo** on the board restores it to its fresh state at any time. Every board is private to its owner, nobody else sees your boards. The import bar also has a one-click **OpenServ Hackathon 02** try-it import.
+Sign up on the landing page to try it: your own Builder.io starter board is waiting with the agent, and **Reset demo** on the board restores it to its fresh state at any time. Every board is private to its owner, nobody else sees your boards. The import bar also has one-click **OpenServ Hackathon 02** and **Hermes Plugin Hackathon** try-it imports.
 
 Paste a hackathon URL and Podium's agent reads the rules, deadlines, requirements and rubric into a board you and the agent share. You tick things off by hand, the agent scores your project against the rubric, argues with you about the scores, and drafts your submission. Every morning it briefs you on what's left.
 
@@ -15,8 +15,9 @@ Paste a hackathon URL and Podium's agent reads the rules, deadlines, requirement
 
 1. Paste `builder.io/hackathon` in the import bar. The board fills in live.
 2. Tick a requirement by hand, then ask the agent “what's left?” — it answers from the same board.
-3. Save Podium itself as the project, hit **Score my project**, disagree with one score and watch it rescore, then apply the top fix.
-4. Click **Draft submission**, then **Add to calendar** and watch the deadline appear with 24-hour and 2-hour alerts.
+3. Save Podium itself as the project, hit **Score my project**, disagree with one score and watch it rescore (the board shows the before and after), then apply the top fix — it lands on the board as a new requirement.
+4. Click **Draft submission**, copy it or download it as `.md`, then **Add to calendar** and watch the deadline appear with 24-hour and 2-hour alerts.
+5. Click **Am I ready to submit?** for a pass or a fix list.
 
 ## Setup
 
@@ -69,20 +70,21 @@ Podium is built on the [Agent-Native framework](https://www.agent-native.com/doc
 | `requirements` | Mission-board items: title, detail, category (`build` / `demo` / `submission` / `eligibility`), done, source (`agent` / `user`), status (`proposed` / `accepted`), order |
 | `milestones` | Dated beats on the road to the deadline |
 | `rubricCriteria` | Judging criteria with weights |
-| `projects` | The entry: name, pitch, repo and demo URLs |
-| `scores` | Per-criterion score (0–10), rationale, top fix, and the user's disagreement note |
+| `projects` | The entry: name, pitch, repo, live and Clips demo URLs |
+| `scores` | Per-criterion score (0–10), rationale, top fix, the user's disagreement note, and the previous score (before/after on rescore) |
 | `drafts` | The submission draft |
 | `briefs` | Saved daily briefs shown on the Today card |
 
 ### Actions
 
-`fetch-hackathon-page` (fetch a page + its linked rules page, return cleaned text, no interpretation) · `save-hackathon` · `list-hackathons` · `get-hackathon` · `add-requirement` · `update-requirement` · `toggle-requirement` · `accept-requirement` · `delete-requirement` · `reorder-requirements` · `save-project` · `save-scores` (weighted total computed in code) · `add-score-note` · `save-draft` · `get-draft` · `whats-left` · `export-calendar` (builds a standard `.ics` in code, with 24h and 2h alerts) · `save-brief` · `get-briefs` · `get-brief-settings` · `save-brief-settings` · `seed-podium` · `clear-board`.
+`fetch-hackathon-page` (fetch a page + its linked rules page, return cleaned text, no interpretation) · `save-hackathon` · `list-hackathons` · `get-hackathon` · `add-requirement` · `update-requirement` · `toggle-requirement` · `accept-requirement` · `delete-requirement` · `reorder-requirements` · `save-project` · `save-scores` (weighted total computed in code) · `add-score-note` · `save-draft` · `get-draft` · `whats-left` · `export-calendar` (builds a standard `.ics` in code, with 24h and 2h alerts) · `check-readiness` (pass or fix list for submission) · `save-brief` · `get-briefs` · `get-brief-settings` · `save-brief-settings` · `seed-podium` · `reset-demo` · `clear-board`.
 
 ### Skills
 
 - `rules-extraction` — call `fetch-hackathon-page`, extract name, organizer, every deadline as an absolute timestamp with its zone, requirements by category, rubric with weights, prizes. Never invent anything; mark unclear items. Then `save-hackathon`.
-- `rubric-coach` — read the project and rubric, score each criterion 0–10 honestly with a one-line rationale and the single highest-impact fix, respect any `userNote` when rescoring, then `save-scores`.
+- `rubric-coach` — read the project and rubric, score each criterion 0–10 honestly with a one-line rationale and the single highest-impact fix, respect any `userNote` when rescoring, then `save-scores`. Applying a top fix means calling `add-requirement` with the fix as the title.
 - `submission-writer` — write the submission description plus a “built during the event” disclosure from the board and project, then `save-draft`.
+- `submission-readiness` — call `check-readiness` and report pass or the fix list, with the deadline stated as Nov 9, 11:59 PM PT (Nov 10, 07:59 UTC).
 - `daily-brief` — check the brief settings, call `whats-left` for each active hackathon, write a short brief (time left, top three open items, weakest criterion), save it with `save-brief`.
 
 ### Reminders
@@ -96,5 +98,6 @@ Podium is built on the [Agent-Native framework](https://www.agent-native.com/doc
 Podium started from the **Agent-Native Chat template** on **November 5, 2026** (scaffolded with `npx --yes @agent-native/core@latest create podium --standalone --template chat`, `@agent-native/core@0.224.0`), and was built during the Builder.io Agent-Native Hackathon.
 
 - **Libraries used:** Agent-Native Core / AgentKit / Toolkit 0.224.0, React 19, React Router 8, Drizzle ORM, zod, Tailwind CSS v4, Radix/shadcn UI, TanStack Query, Sonner, Tabler Icons. No LLM SDK is imported in `actions/` or `app/` — the agent does all reasoning through the framework.
-- **Built new for Podium:** the 8-table Postgres schema + migration, all 23 actions, the 4 skills, the AGENTS.md Podium section, the public landing page at `/` (real board screenshot in the hero), the Home page (import bar, Today card, hackathon cards with countdowns and progress rings), the hackathon page (mission board with drag reorder and inline edit, rubric coach, timeline, project drawer, submission draft, Reset demo), calendar export, daily-brief settings and job, the chat-footer engine recommendation, dark-first theme with a single amber accent, and this README.
+- **Built new for Podium:** the 8-table Postgres schema + migrations, all 27 actions, the 5 skills, the AGENTS.md Podium section, the public landing page at `/` (real board screenshot in the hero), the Home page (import bar, Today card, hackathon cards with countdowns and progress rings), the hackathon page (mission board with drag reorder and inline edit, rubric coach, timeline, project drawer, submission draft, Reset demo), calendar export, daily-brief settings and job, the chat-footer engine recommendation, dark-first theme with a single amber accent, and this README.
+- **Final cleanup pass (Nov 7):** project live URL alongside repo and Clips demo URLs, score before/after on rescore, deterministic Apply top fix (adds a requirement), submission readiness check, draft copy and `.md` download, timezone display (local time with zone label plus official Nov 9, 11:59 PM PT), idempotent requirement toggle, 22 tests covering weighted total, board order, timezone math and `.ics` generation, and the AUDIT.md + CHANGELOG.md for this pass.
 - **Kept from the template:** the chat shell, AgentSidebar, auth, live sync, application state, and the `hello` / `navigate` / `view-screen` framework actions (with `view-screen` extended for Podium's navigation and selection).

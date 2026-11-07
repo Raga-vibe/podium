@@ -15,7 +15,7 @@ const LIVE_URL = "https://podium-82hb.onrender.com";
 const REPO_URL = "https://github.com/Raga-vibe/podium";
 const HACKATHON_URL = "https://www.builder.io/hackathon";
 
-/** The old mock board, kept only as a fallback while /board.png is missing. */
+/** The old mock board, kept only as a fallback while /board.png is missing. No fake numbers: it shows real copy only. */
 function MockBoard() {
   return (
     <div className="space-y-3 p-4 sm:p-5">
@@ -25,11 +25,11 @@ function MockBoard() {
             Builder.io Agent-Native Hackathon
           </p>
           <p className="text-xs text-muted-foreground">
-            3 of 5 requirements done · Score 8.4 / 10
+            Mission board · rubric · timeline
           </p>
         </div>
         <span className="rounded-full bg-amber-400/15 px-2.5 py-1 text-xs font-medium text-amber-300">
-          2 days left
+          Live board
         </span>
       </div>
       <ul className="space-y-2">

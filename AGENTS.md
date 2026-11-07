@@ -52,8 +52,8 @@ Tone: direct, encouraging, specific. Never inflate scores or invent deadlines, p
 - `requirements` — hackathonId, title, detail, category (build|demo|submission|eligibility), done, source (agent|user), status (proposed|accepted), order
 - `milestones` — hackathonId, label, at
 - `rubricCriteria` — hackathonId, name, weight (percent), description
-- `projects` — one per hackathon: name, pitch, repoUrl, demoUrl
-- `scores` — hackathonId, criterionId, score 0-10, rationale, topFix, userNote
+- `projects` — one per hackathon: name, pitch, repoUrl, demoUrl, liveUrl
+- `scores` — hackathonId, criterionId, score 0-10, rationale, topFix, userNote, previousScore (the score it replaced, for before/after on rescore)
 - `drafts` — one per hackathon: body
 - `briefs` — hackathonId (nullable), body
 
@@ -62,12 +62,13 @@ Tone: direct, encouraging, specific. Never inflate scores or invent deadlines, p
 - `fetch-hackathon-page` — fetch a hackathon page plus any linked rules page, return cleaned text only.
 - `save-hackathon` — validate and upsert a hackathon with requirements, milestones and rubric.
 - `list-hackathons` / `get-hackathon` — list with counts and weighted total; full board detail.
-- `add-requirement` / `update-requirement` / `toggle-requirement` / `accept-requirement` / `delete-requirement` / `reorder-requirements` — mission board edits.
-- `save-project` — upsert the one project per hackathon.
-- `save-scores` — store per-criterion scores, compute the weighted total in code.
+- `add-requirement` / `update-requirement` / `toggle-requirement` / `accept-requirement` / `delete-requirement` / `reorder-requirements` — mission board edits. `toggle-requirement` accepts an optional explicit `done` (idempotent; the UI passes it, so a double-click cannot flip twice).
+- `save-project` — upsert the one project per hackathon: name, pitch, repo, live and Clips demo URLs.
+- `save-scores` — store per-criterion scores, compute the weighted total in code. Rescoring a criterion keeps the old score as `previousScore`.
 - `add-score-note` — record the user's disagreement on a score, for rescoring.
 - `save-draft` / `get-draft` — submission draft.
 - `whats-left` — open requirements (any status, each with its status), deadline and time left, weakest criterion, counts. One call answers "what's left?": call it directly, never chain `get-hackathon` for the weakest criterion. Open means not done, whatever the status, so it always agrees with the board's open count. Items come back in board order (Build, Demo, Submission, Eligibility). Present what the actions returned; never blame your tools in your answer.
+- `check-readiness` — deterministic submission readiness: every requirement done, repo/live/Clips demo links present, every criterion scored, draft saved, deadline ahead. Returns pass or a fix list.
 - `export-calendar` — build a .ics file (milestones + deadline, 24h and 2h alerts) in code; a milestone that lands on the submission deadline is exported once, not twice.
 - `save-brief` / `get-briefs` — daily briefs.
 - `get-brief-settings` / `save-brief-settings` — daily brief on/off and time (HH:MM).
@@ -79,8 +80,9 @@ Tone: direct, encouraging, specific. Never inflate scores or invent deadlines, p
 ### Skills (.agents/skills/)
 
 - `rules-extraction` — fetch a page, extract rules only from its text, save via `save-hackathon`.
-- `rubric-coach` — score the project 0-10 per criterion with a rationale and one top fix, save via `save-scores`.
-- `submission-writer` — draft the submission plus a "Built during the event" disclosure, save via `save-draft`.
+- `rubric-coach` — score the project 0-10 per criterion with a rationale and one top fix, save via `save-scores`. Applying a top fix means calling `add-requirement` with the fix as the title (the UI's Apply top fix button does the same directly).
+- `submission-writer` — draft the submission plus a "Built during the event" disclosure, save via `save-draft`. Links: repo, live and Clips demo when present; never invent a missing link.
+- `submission-readiness` — call `check-readiness` and report pass or the fix list; state the deadline as Nov 9, 11:59 PM PT (Nov 10, 07:59 UTC).
 - `daily-brief` — check settings, summarise active hackathons, save via `save-brief`.
 
 ### Daily brief job

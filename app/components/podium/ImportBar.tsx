@@ -93,7 +93,15 @@ export function ImportBar() {
       {sent && !error ? (
         <p role="status" className="mt-2 text-sm text-muted-foreground">
           Agent is reading the page now. The board appears here as soon as it
-          saves the rules, no refresh needed.
+          saves the rules, no refresh needed.{" "}
+          <button
+            type="button"
+            className="font-medium text-foreground underline underline-offset-2"
+            onClick={() => setSent(false)}
+          >
+            Try again
+          </button>{" "}
+          if nothing shows up.
         </p>
       ) : (
         <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">

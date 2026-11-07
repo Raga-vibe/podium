@@ -34,6 +34,7 @@ export function ProjectDrawer({
   const [pitch, setPitch] = useState(project?.pitch ?? "");
   const [repoUrl, setRepoUrl] = useState(project?.repoUrl ?? "");
   const [demoUrl, setDemoUrl] = useState(project?.demoUrl ?? "");
+  const [liveUrl, setLiveUrl] = useState(project?.liveUrl ?? "");
   const save = useActionMutation("save-project");
 
   useEffect(() => {
@@ -42,6 +43,7 @@ export function ProjectDrawer({
       setPitch(project?.pitch ?? "");
       setRepoUrl(project?.repoUrl ?? "");
       setDemoUrl(project?.demoUrl ?? "");
+      setLiveUrl(project?.liveUrl ?? "");
     }
   }, [open, project]);
 
@@ -59,6 +61,7 @@ export function ProjectDrawer({
         pitch: pitch.trim() || undefined,
         repoUrl: repoUrl.trim() || undefined,
         demoUrl: demoUrl.trim() || undefined,
+        liveUrl: liveUrl.trim() || undefined,
       },
       {
         onSuccess: () => {
@@ -116,14 +119,26 @@ export function ProjectDrawer({
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="project-demo">Demo URL</Label>
+            <Label htmlFor="project-demo">Demo URL (Clips)</Label>
             <Input
               id="project-demo"
               type="url"
               inputMode="url"
               value={demoUrl}
               onChange={(event) => setDemoUrl(event.target.value)}
-              placeholder="https://your-demo-link"
+              placeholder="https://your-demo-clip-link"
+              autoComplete="off"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="project-live">Live URL</Label>
+            <Input
+              id="project-live"
+              type="url"
+              inputMode="url"
+              value={liveUrl}
+              onChange={(event) => setLiveUrl(event.target.value)}
+              placeholder="https://your-deployed-app"
               autoComplete="off"
             />
           </div>

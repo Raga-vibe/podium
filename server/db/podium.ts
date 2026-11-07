@@ -76,6 +76,7 @@ export function serializeProject(r: ProjectRow) {
     pitch: r.pitch,
     repoUrl: r.repoUrl,
     demoUrl: r.demoUrl,
+    liveUrl: r.liveUrl,
   };
 }
 
@@ -88,6 +89,7 @@ export function serializeScore(r: ScoreRow) {
     rationale: r.rationale,
     topFix: r.topFix,
     userNote: r.userNote,
+    previousScore: r.previousScore,
     createdAt: iso(r.createdAt),
   };
 }

@@ -96,6 +96,7 @@ export const projects = pgTable(
     pitch: text("pitch"),
     repoUrl: text("repo_url"),
     demoUrl: text("demo_url"),
+    liveUrl: text("live_url"),
     ...ownableColumns(),
   },
   (t) => [uniqueIndex("projects_hackathon_id_uidx").on(t.hackathonId)],
@@ -111,6 +112,7 @@ export const scores = pgTable(
     rationale: text("rationale"),
     topFix: text("top_fix"),
     userNote: text("user_note"),
+    previousScore: integer("previous_score"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

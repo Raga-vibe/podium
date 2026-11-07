@@ -161,6 +161,7 @@ async function insertSeedRows(tx: Tx, hackathonId: string, owner: Owner): Promis
     pitch: SEED_PROJECT.pitch,
     repoUrl: null,
     demoUrl: null,
+    liveUrl: null,
     ownerEmail: owner.ownerEmail,
     orgId: owner.orgId,
   });
@@ -254,6 +255,7 @@ export async function resetSeededHackathon(): Promise<{ hackathonId: string }> {
       pitch: SEED_PROJECT.pitch,
       repoUrl: null,
       demoUrl: null,
+      liveUrl: null,
       ownerEmail: owner.ownerEmail,
       orgId: owner.orgId,
     });

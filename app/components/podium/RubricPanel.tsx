@@ -41,6 +41,8 @@ function CriterionCard({
   const [disagreeing, setDisagreeing] = useState(false);
   const [note, setNote] = useState(score?.userNote ?? "");
   const addNote = useActionMutation("add-score-note");
+  const addRequirement = useActionMutation("add-requirement");
+  const topFix = score?.topFix ?? null;
 
   function submitNote(event: React.FormEvent) {
     event.preventDefault();
@@ -111,6 +113,11 @@ function CriterionCard({
           {score.topFix}
         </p>
       ) : null}
+      {score?.previousScore !== null && score?.previousScore !== undefined && score.previousScore !== score.score ? (
+        <p className="mt-1 text-xs text-muted-foreground">
+          Was {score.previousScore} / 10, now {score.score} / 10
+        </p>
+      ) : null}
       {score?.userNote ? (
         <p className="mt-1 text-xs text-muted-foreground">
           Your note: {score.userNote}
@@ -161,20 +168,31 @@ function CriterionCard({
             </Button>
           )
         ) : null}
-        {score?.topFix ? (
+        {topFix ? (
           <Button
             size="sm"
             variant="ghost"
             className="h-7 px-2 text-xs"
+            disabled={addRequirement.isPending}
             onClick={(event) => {
               event.stopPropagation();
-              askAgent(
-                `Apply the top fix for the criterion "${criterion.name}" on the hackathon "${hackathonName}": ${score.topFix}. Tell me exactly what changed, and update the board if the fix adds or completes a requirement.`,
-                { hackathonId, criterionId: criterion.id, skill: "rubric-coach" },
+              addRequirement.mutate(
+                {
+                  hackathonId,
+                  title: topFix,
+                  detail: `Top fix for ${criterion.name}`,
+                  category: "build",
+                  source: "user",
+                },
+                {
+                  onSuccess: () => toast.success("Top fix added to the board."),
+                  onError: (error) => toast.error(actionErrorMessage(error) ?? "Could not add the top fix."),
+                },
               );
             }}
           >
-            <IconWand className="size-3" aria-hidden /> Apply top fix
+            <IconWand className="size-3" aria-hidden />{" "}
+            {addRequirement.isPending ? "Adding…" : "Apply top fix"}
           </Button>
         ) : null}
       </div>

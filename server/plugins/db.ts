@@ -137,6 +137,18 @@ UPDATE briefs SET owner_email = '${APP_OWNER_EMAIL}' WHERE owner_email = '${LEGA
 CREATE UNIQUE INDEX IF NOT EXISTS hackathons_owner_email_url_uidx ON hackathons (owner_email, url);
 `,
     },
+    {
+      version: 3,
+      name: "podium-project-links-v3",
+      sql: `
+-- The project gets a live (deployed) URL alongside the repo and demo
+-- (Clips) URLs, so scoring and the submission draft can link to all three.
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS live_url text;
+-- When a score is replaced (e.g. after a disagreement), keep the score it
+-- replaced so the UI can show the before and after.
+ALTER TABLE scores ADD COLUMN IF NOT EXISTS previous_score integer;
+`,
+    },
   ],
   { table: "podium_app_migrations" },
 );

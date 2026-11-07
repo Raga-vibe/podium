@@ -52,6 +52,7 @@ export interface Project {
   pitch: string | null;
   repoUrl: string | null;
   demoUrl: string | null;
+  liveUrl: string | null;
 }
 
 export interface Score {
@@ -62,6 +63,7 @@ export interface Score {
   rationale: string | null;
   topFix: string | null;
   userNote: string | null;
+  previousScore: number | null;
   createdAt: string | null;
 }
 

@@ -22,6 +22,8 @@ import {
   rubricCriteria,
   scores,
 } from "../server/db/schema.js";
+import { projectOutputSchema } from "./save-project.js";
+import { scoreOutputSchema } from "./save-scores.js";
 
 const requirementSchema = z.object({
   id: z.string(),
@@ -47,24 +49,8 @@ const rubricSchema = z.object({
   weight: z.number(),
   description: z.string().nullable(),
 });
-const projectSchema = z.object({
-  id: z.string(),
-  hackathonId: z.string(),
-  name: z.string(),
-  pitch: z.string().nullable(),
-  repoUrl: z.string().nullable(),
-  demoUrl: z.string().nullable(),
-});
-const scoreSchema = z.object({
-  id: z.string(),
-  hackathonId: z.string(),
-  criterionId: z.string(),
-  score: z.number(),
-  rationale: z.string().nullable(),
-  topFix: z.string().nullable(),
-  userNote: z.string().nullable(),
-  createdAt: z.string().nullable(),
-});
+const projectSchema = projectOutputSchema;
+const scoreSchema = scoreOutputSchema;
 const draftSchema = z.object({
   id: z.string(),
   hackathonId: z.string(),

@@ -10,7 +10,7 @@ import {
 } from "../server/db/podium.js";
 import { rubricCriteria, scores } from "../server/db/schema.js";
 
-const scoreOutputSchema = z.object({
+export const scoreOutputSchema = z.object({
   id: z.string().describe("Score id"),
   hackathonId: z.string().describe("Hackathon id"),
   criterionId: z.string().describe("Rubric criterion id"),
@@ -18,12 +18,13 @@ const scoreOutputSchema = z.object({
   rationale: z.string().nullable().describe("One-line rationale, or null"),
   topFix: z.string().nullable().describe("Single highest-impact fix, or null"),
   userNote: z.string().nullable().describe("User disagreement note, or null"),
+  previousScore: z.number().nullable().describe("Score this replaced, or null when first scored"),
   createdAt: z.string().nullable().describe("Creation time as an ISO string"),
 });
 
 export default defineAction({
   description:
-    "Store per-criterion rubric scores (0-10) for a hackathon and compute the weighted total. Rescoring a criterion replaces its old score but keeps the user's note.",
+    "Store per-criterion rubric scores (0-10) for a hackathon and compute the weighted total. Rescoring a criterion replaces its old score but keeps the user's note and records the old score as previousScore, so the change shows with a before and after.",
   schema: z.object({
     hackathonId: z.string().describe("Hackathon id"),
     scores: z
@@ -70,6 +71,7 @@ export default defineAction({
           .where(eq(scores.criterionId, s.criterionId))
           .limit(1);
         const userNote = existing?.userNote ?? null;
+        const previousScore = existing?.score ?? null;
         if (existing) {
           await tx.delete(scores).where(eq(scores.id, existing.id));
         }
@@ -83,6 +85,7 @@ export default defineAction({
             rationale: s.rationale ?? null,
             topFix: s.topFix ?? null,
             userNote,
+            previousScore,
             ownerEmail: owner.ownerEmail,
             orgId: owner.orgId,
           })

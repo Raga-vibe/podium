@@ -1,5 +1,6 @@
 import { defineAction } from "@agent-native/core/action";
 import { z } from "zod";
+import { getOwner, requireHackathon } from "../server/db/access.js";
 import { getDb } from "../server/db/index.js";
 import { iso } from "../server/db/podium.js";
 import { briefs } from "../server/db/schema.js";
@@ -16,12 +17,18 @@ export default defineAction({
   }),
   run: async ({ hackathonId, body }) => {
     const db = getDb();
+    const owner = getOwner();
+    if (hackathonId) {
+      await requireHackathon(hackathonId, "viewer");
+    }
     const [row] = await db
       .insert(briefs)
       .values({
         id: crypto.randomUUID(),
         hackathonId: hackathonId ?? null,
         body,
+        ownerEmail: owner.ownerEmail,
+        orgId: owner.orgId,
       })
       .returning();
     if (!row) {

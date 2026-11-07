@@ -1,4 +1,7 @@
-import { ownableColumns } from "@agent-native/core/db/schema";
+import {
+  createSharesTable,
+  ownableColumns,
+} from "@agent-native/core/db/schema";
 import {
   boolean,
   integer,
@@ -14,7 +17,7 @@ export const hackathons = pgTable(
   {
     id: text("id").primaryKey(),
     name: text("name").notNull(),
-    url: text("url").notNull().unique(),
+    url: text("url").notNull(),
     organizer: text("organizer"),
     organizerTimezone: text("organizer_timezone"),
     submissionDeadline: timestamp("submission_deadline", {
@@ -26,7 +29,21 @@ export const hackathons = pgTable(
       .defaultNow(),
     ...ownableColumns(),
   },
+  (t) => [
+    // One board per hackathon page per user. Different users may each hold
+    // the same page (e.g. everyone gets their own Builder.io starter board),
+    // so the uniqueness is per owner, not global.
+    uniqueIndex("hackathons_owner_email_url_uidx").on(t.ownerEmail, t.url),
+  ],
 );
+
+/**
+ * Share grants for hackathon boards. Boards are private by design and the
+ * app ships no share UI, so this table normally stays empty; it exists so
+ * the framework's access helpers (accessFilter / assertAccess) can scope
+ * boards to their owner.
+ */
+export const hackathonShares = createSharesTable("hackathon_shares");
 
 export const requirements = pgTable(
   "requirements",

@@ -4,7 +4,7 @@ import { seedBuilderHackathon } from "../server/db/seed.js";
 
 export default defineAction({
   description:
-    "Seed Podium with a ready-made Builder.io Agent-Native Hackathon record. Does nothing when the seeded board already exists.",
+    "Ensure the current user has their own Builder.io Agent-Native Hackathon starter board. Creates it when they don't have one; does nothing when they already do. Boards are never shared, so every user gets their own copy.",
   schema: z.object({}),
   outputSchema: z.object({
     seeded: z.boolean().describe("True when the seed record was created"),

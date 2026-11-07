@@ -7,7 +7,7 @@ import {
   IconCalendar,
   IconSparkles,
 } from "@tabler/icons-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import { toast } from "sonner";
 
@@ -224,6 +224,23 @@ function TodayCard() {
 export default function HomePage() {
   const hackathonsQuery = useActionQuery("list-hackathons", {});
   const hackathons = hackathonsQuery.data?.hackathons ?? [];
+  const seedStarter = useActionMutation("seed-podium");
+  const seededRef = useRef(false);
+  const listEmpty = hackathonsQuery.isSuccess && hackathons.length === 0;
+
+  // First visit: a user with no boards meets the Builder.io starter board
+  // automatically. It is their own copy, never shared. Anyone who already
+  // has boards is left alone and starts fresh.
+  useEffect(() => {
+    if (!listEmpty || seededRef.current) return;
+    seededRef.current = true;
+    seedStarter.mutate(
+      {},
+      { onSuccess: () => void hackathonsQuery.refetch() },
+    );
+  }, [listEmpty]);
+
+  const seeding = listEmpty && (seedStarter.isPending || seedStarter.isSuccess);
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
@@ -268,6 +285,16 @@ export default function HomePage() {
               >
                 Retry
               </Button>
+            </CardContent>
+          </Card>
+        ) : seeding ? (
+          <Card>
+            <CardContent className="py-10 text-center">
+              <p className="font-medium">Setting up your first board…</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Your own Builder.io starter board is being created. It is
+                yours alone, no one else sees it.
+              </p>
             </CardContent>
           </Card>
         ) : hackathons.length === 0 ? (

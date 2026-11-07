@@ -1,6 +1,7 @@
 import { defineAction, fail } from "@agent-native/core/action";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
+import { getOwner, requireHackathon } from "../server/db/access.js";
 import { getDb } from "../server/db/index.js";
 import {
   hackathons,
@@ -81,22 +82,30 @@ export default defineAction({
   }),
   run: async (args) => {
     const db = getDb();
+    const owner = getOwner();
     const id = await db.transaction(async (tx) => {
       let hackathonId: string | null = null;
       if (args.id) {
-        const existing = await tx
-          .select({ id: hackathons.id })
-          .from(hackathons)
-          .where(eq(hackathons.id, args.id))
-          .limit(1);
-        hackathonId = existing[0]?.id ?? null;
+        // Updating an existing board: it must be the caller's own.
+        await requireHackathon(args.id, "editor");
+        hackathonId = args.id;
       } else {
+        // Upsert by url, but only within the caller's own boards: another
+        // user's board with the same page must never be touched.
         const existing = await tx
           .select({ id: hackathons.id })
           .from(hackathons)
-          .where(eq(hackathons.url, args.url))
+          .where(
+            and(
+              eq(hackathons.ownerEmail, owner.ownerEmail),
+              eq(hackathons.url, args.url),
+            ),
+          )
           .limit(1);
         hackathonId = existing[0]?.id ?? null;
+        if (hackathonId) {
+          await requireHackathon(hackathonId, "editor");
+        }
       }
 
       const values = {
@@ -117,7 +126,12 @@ export default defineAction({
           .where(eq(hackathons.id, hackathonId));
       } else {
         hackathonId = crypto.randomUUID();
-        await tx.insert(hackathons).values({ id: hackathonId, ...values });
+        await tx.insert(hackathons).values({
+          id: hackathonId,
+          ...values,
+          ownerEmail: owner.ownerEmail,
+          orgId: owner.orgId,
+        });
       }
 
       if (args.requirements !== undefined) {
@@ -136,6 +150,8 @@ export default defineAction({
               source: r.source,
               status: r.status,
               order: i,
+              ownerEmail: owner.ownerEmail,
+              orgId: owner.orgId,
             })),
           );
         }
@@ -151,6 +167,8 @@ export default defineAction({
               hackathonId: hackathonId as string,
               label: m.label,
               at: new Date(m.at),
+              ownerEmail: owner.ownerEmail,
+              orgId: owner.orgId,
             })),
           );
         }
@@ -167,6 +185,8 @@ export default defineAction({
               name: c.name,
               weight: c.weight,
               description: c.description ?? null,
+              ownerEmail: owner.ownerEmail,
+              orgId: owner.orgId,
             })),
           );
         }

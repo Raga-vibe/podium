@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { askAgent } from "@/lib/podium";
 
+/** The OpenServ SERV Hackathon 02 page, offered as a one-click try-it import. */
+const OPENSERV_HACKATHON_URL = "https://www.openserv.ai/hackathon-2";
+
 /**
  * Paste a hackathon URL. The UI never fetches or interprets the page itself:
  * it asks the agent to run rules-extraction, which calls fetch-hackathon-page
@@ -13,6 +16,15 @@ export function ImportBar() {
   const [url, setUrl] = useState("");
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  function tryOpenserv() {
+    setError(null);
+    askAgent(
+      `Import this hackathon page into Podium using the rules-extraction skill: ${OPENSERV_HACKATHON_URL}. Extract the rules, deadlines, requirements, rubric and prizes, then save the hackathon.`,
+      { url: OPENSERV_HACKATHON_URL, skill: "rules-extraction" },
+    );
+    setSent(true);
+  }
 
   function submit(event: React.FormEvent) {
     event.preventDefault();
@@ -70,11 +82,22 @@ export function ImportBar() {
           saves the rules, no refresh needed.
         </p>
       ) : (
-        <p className="mt-2 text-sm text-muted-foreground">
-          Try it: paste{" "}
-          <span className="font-medium text-foreground">builder.io/hackathon</span>{" "}
-          or any Devpost hackathon page.
-        </p>
+        <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+          <span>Try it:</span>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={tryOpenserv}
+          >
+            OpenServ Hackathon 02
+          </Button>
+          <span>
+            or paste{" "}
+            <span className="font-medium text-foreground">builder.io/hackathon</span>{" "}
+            or any Devpost hackathon page.
+          </span>
+        </div>
       )}
     </div>
   );

@@ -1,6 +1,7 @@
 import { defineAction } from "@agent-native/core/action";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { requireHackathon } from "../server/db/access.js";
 import { getDb } from "../server/db/index.js";
 import { drafts } from "../server/db/schema.js";
 
@@ -17,6 +18,7 @@ export default defineAction({
   readOnly: true,
   run: async ({ hackathonId }) => {
     const db = getDb();
+    await requireHackathon(hackathonId, "viewer");
     const [draft] = await db
       .select()
       .from(drafts)

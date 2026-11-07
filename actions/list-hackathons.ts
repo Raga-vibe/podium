@@ -1,11 +1,13 @@
 import { defineAction } from "@agent-native/core/action";
+import { accessFilter } from "@agent-native/core/sharing";
+import { inArray } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "../server/db/index.js";
 import {
   serializeHackathon,
   weightedTotal,
 } from "../server/db/podium.js";
-import { hackathons, requirements, rubricCriteria, scores } from "../server/db/schema.js";
+import { hackathonShares, hackathons, requirements, rubricCriteria, scores } from "../server/db/schema.js";
 
 const hackathonSummarySchema = z.object({
   id: z.string().describe("Hackathon id"),
@@ -32,11 +34,23 @@ export default defineAction({
   readOnly: true,
   run: async () => {
     const db = getDb();
-    const [all, allReqs, allScores, allRubric] = await Promise.all([
-      db.select().from(hackathons),
-      db.select().from(requirements),
-      db.select().from(scores),
-      db.select().from(rubricCriteria),
+    // Only the caller's own boards (plus any explicitly shared with them).
+    // Boards are private by design, so this is the user's own list.
+    const all = await db
+      .select()
+      .from(hackathons)
+      .where(accessFilter(hackathons, hackathonShares));
+    const ids = all.map((h) => h.id);
+    const [allReqs, allScores, allRubric] = await Promise.all([
+      ids.length > 0
+        ? db.select().from(requirements).where(inArray(requirements.hackathonId, ids))
+        : Promise.resolve([]),
+      ids.length > 0
+        ? db.select().from(scores).where(inArray(scores.hackathonId, ids))
+        : Promise.resolve([]),
+      ids.length > 0
+        ? db.select().from(rubricCriteria).where(inArray(rubricCriteria.hackathonId, ids))
+        : Promise.resolve([]),
     ]);
     const reqsByHackathon = new Map<string, typeof allReqs>();
     for (const r of allReqs) {

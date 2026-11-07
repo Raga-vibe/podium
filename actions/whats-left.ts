@@ -1,6 +1,7 @@
-import { defineAction, fail } from "@agent-native/core/action";
+import { defineAction } from "@agent-native/core/action";
 import { asc, eq } from "drizzle-orm";
 import { z } from "zod";
+import { requireHackathon } from "../server/db/access.js";
 import { getDb } from "../server/db/index.js";
 import {
   latestScores,
@@ -8,7 +9,7 @@ import {
   sortRequirementsByBoardOrder,
   weakestCriterion,
 } from "../server/db/podium.js";
-import { hackathons, requirements, rubricCriteria, scores } from "../server/db/schema.js";
+import { requirements, rubricCriteria, scores } from "../server/db/schema.js";
 import { requirementOutputSchema } from "./add-requirement.js";
 
 export default defineAction({
@@ -52,12 +53,7 @@ export default defineAction({
   readOnly: true,
   run: async ({ hackathonId }) => {
     const db = getDb();
-    const [hackathon] = await db
-      .select()
-      .from(hackathons)
-      .where(eq(hackathons.id, hackathonId))
-      .limit(1);
-    if (!hackathon) fail(`Hackathon not found: ${hackathonId}`, { statusCode: 404 });
+    const hackathon = await requireHackathon(hackathonId, "viewer");
     const [all, rubric, scoreRows] = await Promise.all([
       db
         .select()

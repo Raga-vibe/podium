@@ -1,9 +1,10 @@
-import { defineAction, fail } from "@agent-native/core/action";
+import { defineAction } from "@agent-native/core/action";
 import { asc, eq } from "drizzle-orm";
 import { z } from "zod";
+import { requireHackathon } from "../server/db/access.js";
 import { getDb } from "../server/db/index.js";
 import { buildCalendarEvents, buildIcs, slugify } from "../server/db/podium.js";
-import { hackathons, milestones } from "../server/db/schema.js";
+import { milestones } from "../server/db/schema.js";
 
 export default defineAction({
   description:
@@ -21,12 +22,7 @@ export default defineAction({
   readOnly: true,
   run: async ({ hackathonId }) => {
     const db = getDb();
-    const [hackathon] = await db
-      .select()
-      .from(hackathons)
-      .where(eq(hackathons.id, hackathonId))
-      .limit(1);
-    if (!hackathon) fail(`Hackathon not found: ${hackathonId}`, { statusCode: 404 });
+    const hackathon = await requireHackathon(hackathonId, "viewer");
     const miles = await db
       .select()
       .from(milestones)

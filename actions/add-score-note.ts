@@ -1,6 +1,7 @@
 import { defineAction, fail } from "@agent-native/core/action";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { requireHackathon } from "../server/db/access.js";
 import { getDb } from "../server/db/index.js";
 import { serializeScore } from "../server/db/podium.js";
 import { scores } from "../server/db/schema.js";
@@ -25,6 +26,13 @@ export default defineAction({
   outputSchema: scoreOutputSchema,
   run: async ({ scoreId, note }) => {
     const db = getDb();
+    const [existing] = await db
+      .select({ hackathonId: scores.hackathonId })
+      .from(scores)
+      .where(eq(scores.id, scoreId))
+      .limit(1);
+    if (!existing) fail(`Score not found: ${scoreId}`, { statusCode: 404 });
+    await requireHackathon(existing.hackathonId, "editor");
     const [row] = await db
       .update(scores)
       .set({ userNote: note })

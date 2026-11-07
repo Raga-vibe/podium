@@ -1,6 +1,7 @@
 import { defineAction, fail } from "@agent-native/core/action";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { requireHackathon } from "../server/db/access.js";
 import { getDb } from "../server/db/index.js";
 import { serializeRequirement } from "../server/db/podium.js";
 import { requirements } from "../server/db/schema.js";
@@ -31,6 +32,13 @@ export default defineAction({
     if (Object.keys(patch).length === 0) {
       fail("Nothing to update: pass title, detail or category");
     }
+    const [existing] = await db
+      .select({ hackathonId: requirements.hackathonId })
+      .from(requirements)
+      .where(eq(requirements.id, id))
+      .limit(1);
+    if (!existing) fail(`Requirement not found: ${id}`, { statusCode: 404 });
+    await requireHackathon(existing.hackathonId, "editor");
     const [row] = await db
       .update(requirements)
       .set(patch)

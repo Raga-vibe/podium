@@ -1,9 +1,10 @@
 import { defineAction, fail } from "@agent-native/core/action";
 import { asc, eq } from "drizzle-orm";
 import { z } from "zod";
+import { getOwner, requireHackathon } from "../server/db/access.js";
 import { getDb } from "../server/db/index.js";
 import { serializeRequirement } from "../server/db/podium.js";
-import { hackathons, requirements } from "../server/db/schema.js";
+import { requirements } from "../server/db/schema.js";
 
 export const requirementOutputSchema = z.object({
   id: z.string().describe("Requirement id"),
@@ -36,12 +37,8 @@ export default defineAction({
   outputSchema: requirementOutputSchema,
   run: async ({ hackathonId, title, detail, category, source }) => {
     const db = getDb();
-    const [hackathon] = await db
-      .select({ id: hackathons.id })
-      .from(hackathons)
-      .where(eq(hackathons.id, hackathonId))
-      .limit(1);
-    if (!hackathon) fail(`Hackathon not found: ${hackathonId}`, { statusCode: 404 });
+    const owner = getOwner();
+    await requireHackathon(hackathonId, "editor");
     const existing = await db
       .select({ order: requirements.order })
       .from(requirements)
@@ -60,6 +57,8 @@ export default defineAction({
         source,
         status: "accepted",
         order: maxOrder + 1,
+        ownerEmail: owner.ownerEmail,
+        orgId: owner.orgId,
       })
       .returning();
     if (!row) fail("Failed to add requirement");

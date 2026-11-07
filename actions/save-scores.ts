@@ -1,6 +1,7 @@
 import { defineAction, fail } from "@agent-native/core/action";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
+import { getOwner, requireHackathon } from "../server/db/access.js";
 import { getDb } from "../server/db/index.js";
 import {
   latestScores,
@@ -44,10 +45,17 @@ export default defineAction({
   }),
   run: async ({ hackathonId, scores: inputScores }) => {
     const db = getDb();
+    const owner = getOwner();
+    await requireHackathon(hackathonId, "editor");
     const criteria = await db
       .select()
       .from(rubricCriteria)
-      .where(eq(rubricCriteria.hackathonId, hackathonId));
+      .where(
+        and(
+          eq(rubricCriteria.hackathonId, hackathonId),
+          eq(rubricCriteria.ownerEmail, owner.ownerEmail),
+        ),
+      );
     const criterionIds = new Set(criteria.map((c) => c.id));
     for (const s of inputScores) {
       if (!criterionIds.has(s.criterionId)) {
@@ -75,6 +83,8 @@ export default defineAction({
             rationale: s.rationale ?? null,
             topFix: s.topFix ?? null,
             userNote,
+            ownerEmail: owner.ownerEmail,
+            orgId: owner.orgId,
           })
           .returning();
         if (!row) fail("Failed to save score");
@@ -86,7 +96,12 @@ export default defineAction({
     const allScores = await db
       .select()
       .from(scores)
-      .where(eq(scores.hackathonId, hackathonId));
+      .where(
+        and(
+          eq(scores.hackathonId, hackathonId),
+          eq(scores.ownerEmail, owner.ownerEmail),
+        ),
+      );
     const latest = latestScores(allScores);
     return {
       hackathonId,

@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 
+import { getOwner } from "./access.js";
 import { getDb } from "./index.js";
 import {
   briefs,
@@ -15,14 +16,10 @@ import {
 /** Transaction client type, derived from the db handle. */
 type Tx = Parameters<Parameters<ReturnType<typeof getDb>["transaction"]>[0]>[0];
 
-/**
- * Stable id of the seeded Builder.io Agent-Native Hackathon board, used when
- * seeding a fresh database. The live board predates it (it was seeded with a
- * random id), so reset-demo finds the board by its URL instead, never by id.
- */
-export const SEED_HACKATHON_ID = "00000000-0000-4000-8000-000000000001";
+/** The signed-in user, for stamping ownership on seeded rows. */
+type Owner = { ownerEmail: string; orgId: string | null };
 
-/** The hackathon page the demo board comes from. Its url is unique, so it identifies the demo board on any database. */
+/** The hackathon page the starter board comes from. Its url identifies a user's Builder.io board. */
 export const SEED_HACKATHON_URL = "https://www.builder.io/hackathon";
 
 /** Compare hackathon URLs ignoring scheme, a leading www., casing and a trailing slash. */
@@ -102,7 +99,7 @@ const SEED_PROJECT = {
     "Turns any hackathon page into a live mission board and coaches the builder toward a winning entry.",
 };
 
-async function insertRequirements(tx: Tx, hackathonId: string): Promise<void> {
+async function insertRequirements(tx: Tx, hackathonId: string, owner: Owner): Promise<void> {
   await tx.insert(requirements).values(
     SEED_REQUIREMENTS.map((r, i) => ({
       id: crypto.randomUUID(),
@@ -114,11 +111,13 @@ async function insertRequirements(tx: Tx, hackathonId: string): Promise<void> {
       source: "agent",
       status: "accepted",
       order: i,
+      ownerEmail: owner.ownerEmail,
+      orgId: owner.orgId,
     })),
   );
 }
 
-async function insertRubric(tx: Tx, hackathonId: string): Promise<void> {
+async function insertRubric(tx: Tx, hackathonId: string, owner: Owner): Promise<void> {
   await tx.insert(rubricCriteria).values(
     SEED_RUBRIC.map((c) => ({
       id: crypto.randomUUID(),
@@ -126,11 +125,13 @@ async function insertRubric(tx: Tx, hackathonId: string): Promise<void> {
       name: c.name,
       weight: c.weight,
       description: c.description,
+      ownerEmail: owner.ownerEmail,
+      orgId: owner.orgId,
     })),
   );
 }
 
-async function insertSeedRows(tx: Tx, hackathonId: string): Promise<void> {
+async function insertSeedRows(tx: Tx, hackathonId: string, owner: Owner): Promise<void> {
   await tx.insert(hackathons).values({
     id: hackathonId,
     name: "Builder.io Agent-Native Hackathon",
@@ -140,15 +141,19 @@ async function insertSeedRows(tx: Tx, hackathonId: string): Promise<void> {
     submissionDeadline: new Date(DEADLINE),
     prizeSummary:
       "Prizes for the top agent-native apps built on the Agent-Native framework (see hackathon page for details)",
+    ownerEmail: owner.ownerEmail,
+    orgId: owner.orgId,
   });
-  await insertRequirements(tx, hackathonId);
+  await insertRequirements(tx, hackathonId, owner);
   await tx.insert(milestones).values({
     id: crypto.randomUUID(),
     hackathonId,
     label: "Submissions close",
     at: new Date(DEADLINE),
+    ownerEmail: owner.ownerEmail,
+    orgId: owner.orgId,
   });
-  await insertRubric(tx, hackathonId);
+  await insertRubric(tx, hackathonId, owner);
   await tx.insert(projects).values({
     id: crypto.randomUUID(),
     hackathonId,
@@ -156,34 +161,53 @@ async function insertSeedRows(tx: Tx, hackathonId: string): Promise<void> {
     pitch: SEED_PROJECT.pitch,
     repoUrl: null,
     demoUrl: null,
+    ownerEmail: owner.ownerEmail,
+    orgId: owner.orgId,
   });
 }
 
-/** Create the seeded board when it is missing. Does nothing when it already exists. */
+/** The current user's own Builder.io starter board, if they have one. */
+async function findMyStarterBoard(ownerEmail: string): Promise<{ id: string } | null> {
+  const db = getDb();
+  const mine = await db
+    .select({ id: hackathons.id, url: hackathons.url })
+    .from(hackathons)
+    .where(eq(hackathons.ownerEmail, ownerEmail));
+  return mine.find((h) => sameHackathonUrl(h.url, SEED_HACKATHON_URL)) ?? null;
+}
+
+/**
+ * Ensure the current user has their own Builder.io starter board. Creates
+ * it (fresh id, owned by them) when they don't have one; does nothing when
+ * they already do. Boards are never shared: every user gets their own copy.
+ */
 export async function seedBuilderHackathon(): Promise<{
   seeded: boolean;
   reason?: string;
   hackathonId?: string;
 }> {
-  const db = getDb();
-  const existing = await db
-    .select({ id: hackathons.id })
-    .from(hackathons)
-    .where(eq(hackathons.id, SEED_HACKATHON_ID))
-    .limit(1);
-  if (existing.length > 0) {
-    return { seeded: false, reason: "seeded hackathon already exists" };
+  const owner = getOwner();
+  const existing = await findMyStarterBoard(owner.ownerEmail);
+  if (existing) {
+    return {
+      seeded: false,
+      reason: "you already have the Builder.io board",
+      hackathonId: existing.id,
+    };
   }
+  const hackathonId = crypto.randomUUID();
+  const db = getDb();
   await db.transaction(async (tx) => {
-    await insertSeedRows(tx, SEED_HACKATHON_ID);
+    await insertSeedRows(tx, hackathonId, owner);
   });
-  return { seeded: true, hackathonId: SEED_HACKATHON_ID };
+  return { seeded: true, hackathonId };
 }
 
 /**
- * Restore the demo board to its fresh state, in place. The board is found by
- * its hackathon URL, so it works on the live database (whose board predates
- * the fixed seed id) as well as on a fresh one.
+ * Restore the current user's demo board to its fresh state, in place. The
+ * board is their own Builder.io starter board, found by its hackathon URL;
+ * other users' boards are never touched. If they don't have one yet, one
+ * is seeded for them first.
  *
  * The board's own requirements are kept: on the live board they are the
  * seven real rules imported from the hackathon page, which are better demo
@@ -195,12 +219,15 @@ export async function seedBuilderHackathon(): Promise<{
  * are never touched.
  */
 export async function resetSeededHackathon(): Promise<{ hackathonId: string }> {
+  const owner = getOwner();
   const db = getDb();
-  const all = await db.select({ id: hackathons.id, url: hackathons.url }).from(hackathons);
-  const found = all.find((h) => sameHackathonUrl(h.url, SEED_HACKATHON_URL));
+  const found = await findMyStarterBoard(owner.ownerEmail);
   if (!found) {
     const seeded = await seedBuilderHackathon();
-    return { hackathonId: seeded.hackathonId ?? SEED_HACKATHON_ID };
+    if (!seeded.hackathonId) {
+      throw new Error("Could not seed the demo board");
+    }
+    return { hackathonId: seeded.hackathonId };
   }
   const hackathonId = found.id;
   await db.transaction(async (tx) => {
@@ -214,7 +241,7 @@ export async function resetSeededHackathon(): Promise<{ hackathonId: string }> {
       .where(eq(requirements.hackathonId, hackathonId))
       .limit(1);
     if (remaining.length === 0) {
-      await insertRequirements(tx, hackathonId);
+      await insertRequirements(tx, hackathonId, owner);
     }
     await tx.delete(scores).where(eq(scores.hackathonId, hackathonId));
     await tx.delete(drafts).where(eq(drafts.hackathonId, hackathonId));
@@ -227,9 +254,11 @@ export async function resetSeededHackathon(): Promise<{ hackathonId: string }> {
       pitch: SEED_PROJECT.pitch,
       repoUrl: null,
       demoUrl: null,
+      ownerEmail: owner.ownerEmail,
+      orgId: owner.orgId,
     });
     await tx.delete(rubricCriteria).where(eq(rubricCriteria.hackathonId, hackathonId));
-    await insertRubric(tx, hackathonId);
+    await insertRubric(tx, hackathonId, owner);
   });
   return { hackathonId };
 }

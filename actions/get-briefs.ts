@@ -1,9 +1,11 @@
 import { defineAction } from "@agent-native/core/action";
-import { desc } from "drizzle-orm";
+import { accessFilter } from "@agent-native/core/sharing";
+import { desc, eq } from "drizzle-orm";
 import { z } from "zod";
+import { getOwner } from "../server/db/access.js";
 import { getDb } from "../server/db/index.js";
 import { serializeBrief } from "../server/db/podium.js";
-import { briefs, hackathons } from "../server/db/schema.js";
+import { briefs, hackathonShares, hackathons } from "../server/db/schema.js";
 
 export default defineAction({
   description: "Get the latest 5 daily briefs, with the hackathon name when linked.",
@@ -23,15 +25,22 @@ export default defineAction({
   readOnly: true,
   run: async () => {
     const db = getDb();
+    const owner = getOwner();
+    // Briefs are the caller's own: a brief about another user's board, or
+    // a general brief someone else wrote, never shows up here.
     const rows = await db
       .select()
       .from(briefs)
+      .where(eq(briefs.ownerEmail, owner.ownerEmail))
       .orderBy(desc(briefs.createdAt))
       .limit(5);
     const names = new Map<string, string>();
     const ids = [...new Set(rows.map((r) => r.hackathonId).filter((id): id is string => id !== null))];
     if (ids.length > 0) {
-      const hs = await db.select().from(hackathons);
+      const hs = await db
+        .select()
+        .from(hackathons)
+        .where(accessFilter(hackathons, hackathonShares));
       for (const h of hs) {
         if (ids.includes(h.id)) names.set(h.id, h.name);
       }

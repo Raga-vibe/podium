@@ -4,7 +4,7 @@
 
 Live demo: **https://podium-82hb.onrender.com** · Source: this repo.
 
-Sign up on the landing page to try it: the seeded Builder.io board is ready with the agent, and **Reset demo** on the board restores it to its fresh state at any time.
+Sign up on the landing page to try it: your own Builder.io starter board is waiting with the agent, and **Reset demo** on the board restores it to its fresh state at any time. Every board is private to its owner, nobody else sees your boards. The import bar also has a one-click **OpenServ Hackathon 02** try-it import.
 
 Paste a hackathon URL and Podium's agent reads the rules, deadlines, requirements and rubric into a board you and the agent share. You tick things off by hand, the agent scores your project against the rubric, argues with you about the scores, and drafts your submission. Every morning it briefs you on what's left.
 

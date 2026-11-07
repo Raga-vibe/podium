@@ -76,7 +76,7 @@ Podium is built on the [Agent-Native framework](https://www.agent-native.com/doc
 
 ### Actions
 
-`fetch-hackathon-page` (fetch a page + its linked rules page, return cleaned text, no interpretation) · `save-hackathon` · `list-hackathons` · `get-hackathon` · `add-requirement` · `update-requirement` · `toggle-requirement` · `accept-requirement` · `delete-requirement` · `reorder-requirements` · `save-project` · `save-scores` (weighted total computed in code) · `add-score-note` · `save-draft` · `get-draft` · `whats-left` · `export-calendar` (builds a standard `.ics` in code, with 24h and 2h alerts) · `save-brief` · `get-briefs` · `get-brief-settings` · `save-brief-settings` · `seed-podium`.
+`fetch-hackathon-page` (fetch a page + its linked rules page, return cleaned text, no interpretation) · `save-hackathon` · `list-hackathons` · `get-hackathon` · `add-requirement` · `update-requirement` · `toggle-requirement` · `accept-requirement` · `delete-requirement` · `reorder-requirements` · `save-project` · `save-scores` (weighted total computed in code) · `add-score-note` · `save-draft` · `get-draft` · `whats-left` · `export-calendar` (builds a standard `.ics` in code, with 24h and 2h alerts) · `save-brief` · `get-briefs` · `get-brief-settings` · `save-brief-settings` · `seed-podium` · `clear-board`.
 
 ### Skills
 

@@ -73,6 +73,7 @@ Tone: direct, encouraging, specific. Never inflate scores or invent deadlines, p
 - `get-brief-settings` / `save-brief-settings` — daily brief on/off and time (HH:MM).
 - `seed-podium` — ensure the caller has their own Builder.io starter board (fresh id per user, see `server/db/seed.ts`). Creates it when they don't have one; does nothing when they do. HomePage calls it once when a user with no boards loads Home, so a first-time user meets the Builder.io board automatically.
 - `reset-demo` — restore the caller's demo board to its fresh state (requirements open and accepted, scores/draft/briefs cleared, project restored to Podium, rubric restored to the official Builder.io criteria). Finds the caller's board by its hackathon URL (normalized, so a trailing slash or a missing www still matches); the board's own requirements are kept.
+- `clear-board` — delete a board and everything on it (requirements, milestones, rubric, scores, project, draft, briefs) for the current user only. Every delete is scoped to the board AND the owner. After clearing, the user lands on Home; if it was their only board, Home seeds a fresh Builder.io starter board next visit.
 - `view-screen` — current navigation, plus the on-screen hackathon summary.
 
 ### Skills (.agents/skills/)

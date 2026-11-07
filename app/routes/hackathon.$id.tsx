@@ -10,7 +10,7 @@ import {
   IconSparkles,
 } from "@tabler/icons-react";
 import { useState } from "react";
-import { Link, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 
 import { Countdown } from "@/components/podium/Countdown";
@@ -51,11 +51,13 @@ const SEED_HACKATHON_URL = "https://www.builder.io/hackathon";
 
 export default function HackathonRoute() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const hackathonId = id ?? "";
   const query = useActionQuery("get-hackathon", { id: hackathonId });
   const [projectOpen, setProjectOpen] = useState(false);
   const [selection, setSelection] = useState<Selection>(null);
   const [resetting, setResetting] = useState(false);
+  const [clearing, setClearing] = useState(false);
 
   async function resetDemo() {
     if (
@@ -74,6 +76,26 @@ export default function HackathonRoute() {
       toast.error("Could not reset the demo board. Try again.");
     } finally {
       setResetting(false);
+    }
+  }
+
+  async function clearBoard() {
+    if (
+      !window.confirm(
+        "Clear this board? This deletes the hackathon and everything on it (requirements, scores, draft, project). This cannot be undone.",
+      )
+    ) {
+      return;
+    }
+    setClearing(true);
+    try {
+      await callAction("clear-board", { id: hackathonId });
+      toast.success("Board cleared");
+      navigate("/home");
+    } catch {
+      toast.error("Could not clear the board. Try again.");
+    } finally {
+      setClearing(false);
     }
   }
 
@@ -228,6 +250,26 @@ export default function HackathonRoute() {
               )}
             </Button>
           ) : null}
+          <Button
+            size="sm"
+            variant="ghost"
+            disabled={clearing}
+            onClick={() => void clearBoard()}
+            title="Delete this board and everything on it"
+            className="text-red-400 hover:text-red-300"
+          >
+            {clearing ? (
+              <>
+                <IconLoader2
+                  className="size-4 motion-safe:animate-spin"
+                  aria-hidden
+                />{" "}
+                Clearing…
+              </>
+            ) : (
+              "Clear board"
+            )}
+          </Button>
         </div>
         {selection ? (
           <p className="mt-3 text-xs text-muted-foreground" role="status">

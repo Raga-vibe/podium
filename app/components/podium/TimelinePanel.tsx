@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 import { Countdown } from "@/components/podium/Countdown";
 import { Button } from "@/components/ui/button";
-import { formatDay, type Milestone } from "@/lib/podium";
+import { formatDay, formatInZone, type Milestone } from "@/lib/podium";
 
 export function TimelinePanel({
   hackathonId,
@@ -46,6 +46,7 @@ export function TimelinePanel({
   }
 
   const deadlineLabel = deadline ? formatDay(deadline) : null;
+  const organizerTime = formatInZone(deadline, organizerTimezone);
 
   return (
     <div>
@@ -68,7 +69,12 @@ export function TimelinePanel({
               <br />
               <span className="text-muted-foreground">
                 {deadlineLabel}
-                {organizerTimezone ? ` · ${organizerTimezone}` : ""}
+                {organizerTime ? (
+                  <>
+                    <br />
+                    {organizerTime} (official)
+                  </>
+                ) : null}
               </span>
               <br />
               <Countdown deadline={deadline} className="font-medium text-amber-300" />

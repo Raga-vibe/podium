@@ -124,15 +124,16 @@ function RequirementRow({
       <input
         type="checkbox"
         checked={requirement.done}
+        disabled={toggle.isPending}
         onChange={() =>
           toggle.mutate(
-            { id: requirement.id },
+            { id: requirement.id, done: !requirement.done },
             { onError: (error) => toast.error(actionErrorMessage(error) ?? "Could not update.") },
           )
         }
         onClick={(event) => event.stopPropagation()}
         aria-label={`Mark "${requirement.title}" as ${requirement.done ? "not done" : "done"}`}
-        className="mt-0.5 size-5 shrink-0 accent-amber-400"
+        className="mt-0.5 size-5 shrink-0 accent-amber-400 disabled:opacity-50"
       />
       <div className="min-w-0 flex-1">
         {editing ? (

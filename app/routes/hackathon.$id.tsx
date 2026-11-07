@@ -206,6 +206,18 @@ export default function HackathonRoute() {
           <Button
             size="sm"
             variant="outline"
+            onClick={() =>
+              askAgent(
+                `Am I ready to submit the hackathon "${hackathon.name}"? Use the submission-readiness skill and the check-readiness action, then tell me pass or the fix list.`,
+                { hackathonId, skill: "submission-readiness" },
+              )
+            }
+          >
+            Am I ready to submit?
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
             disabled={!weakest}
             onClick={() =>
               weakest &&

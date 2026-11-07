@@ -2,7 +2,7 @@ import {
   actionErrorMessage,
   useActionMutation,
 } from "@agent-native/core/client/hooks";
-import { IconCheck, IconCopy, IconSparkles } from "@tabler/icons-react";
+import { IconCheck, IconCopy, IconDownload, IconSparkles } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -48,6 +48,23 @@ export function DraftPanel({
     }
   }
 
+  function download() {
+    const slug = hackathonName
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+    const blob = new Blob([body], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `${slug || "hackathon"}-submission-draft.md`;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+    toast.success("Draft downloaded as Markdown.");
+  }
+
   return (
     <div>
       <div className="mb-3 flex flex-wrap gap-2">
@@ -72,6 +89,9 @@ export function DraftPanel({
             <IconCopy className="size-4" aria-hidden />
           )}
           {copied ? "Copied" : "Copy"}
+        </Button>
+        <Button variant="outline" onClick={download} disabled={!body}>
+          <IconDownload className="size-4" aria-hidden /> Download .md
         </Button>
       </div>
       <textarea

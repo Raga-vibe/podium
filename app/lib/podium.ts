@@ -148,7 +148,7 @@ export function formatCountdown(left: TimeLeft | null): string {
   return `${left.overdue ? "Overdue by " : ""}${parts.join(" ")}${left.overdue ? "" : " left"}`;
 }
 
-/** Deadline rendered in the viewer's local timezone. */
+/** Deadline rendered in the viewer's local timezone, with the local zone label. */
 export function formatLocal(iso: string | null): string {
   if (!iso) return "No deadline";
   return new Intl.DateTimeFormat(undefined, {
@@ -156,6 +156,7 @@ export function formatLocal(iso: string | null): string {
     day: "numeric",
     hour: "numeric",
     minute: "2-digit",
+    timeZoneName: "short",
   }).format(new Date(iso));
 }
 
@@ -171,7 +172,13 @@ export function formatInZone(iso: string | null, timeZone: string | null): strin
       minute: "2-digit",
       timeZoneName: "short",
     }).format(new Date(iso));
-    return `${when} (${timeZone})`;
+    // The official deadline is stated as "Nov 9, 11:59 PM PT": show the
+    // generic PT label for the Pacific zone instead of PST/PDT. Never append
+    // the raw IANA name (America/Los_Angeles).
+    if (timeZone === "America/Los_Angeles") {
+      return when.replace(/\s(PST|PDT)$/, " PT");
+    }
+    return when;
   } catch {
     return null;
   }
@@ -184,6 +191,7 @@ export function formatDay(iso: string | null): string {
     day: "numeric",
     hour: "numeric",
     minute: "2-digit",
+    timeZoneName: "short",
   }).format(new Date(iso));
 }
 

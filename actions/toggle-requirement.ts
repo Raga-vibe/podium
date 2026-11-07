@@ -8,12 +8,13 @@ import { requirements } from "../server/db/schema.js";
 import { requirementOutputSchema } from "./add-requirement.js";
 
 export default defineAction({
-  description: "Flip a requirement's done state.",
+  description: "Set a requirement's done state. Pass done to set it explicitly (idempotent); omit it to flip the current state.",
   schema: z.object({
     id: z.string().describe("Requirement id"),
+    done: z.boolean().optional().describe("Target done state; omit to flip"),
   }),
   outputSchema: requirementOutputSchema,
-  run: async ({ id }) => {
+  run: async ({ id, done }) => {
     const db = getDb();
     const [existing] = await db
       .select()
@@ -24,7 +25,7 @@ export default defineAction({
     await requireHackathon(existing.hackathonId, "editor");
     const [row] = await db
       .update(requirements)
-      .set({ done: !existing.done })
+      .set({ done: done ?? !existing.done })
       .where(eq(requirements.id, id))
       .returning();
     if (!row) fail(`Requirement not found: ${id}`, { statusCode: 404 });

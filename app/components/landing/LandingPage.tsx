@@ -5,7 +5,6 @@ import {
   IconCheck,
   IconRobot,
   IconSparkles,
-  IconTrophy,
 } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { Link, Navigate } from "react-router";
@@ -206,7 +205,7 @@ export default function LandingPage() {
       <header className="sticky top-0 z-40 border-b border-border/60 bg-background/90 backdrop-blur">
         <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
           <Link to="/" className="flex items-center gap-2 font-bold tracking-tight">
-            <IconTrophy className="size-5 text-amber-400" aria-hidden />
+            <img src="/podium-icon.svg" alt="Podium logo" className="size-6" />
             Podium
           </Link>
           <nav className="hidden items-center gap-6 text-sm text-muted-foreground md:flex" aria-label="Product">
@@ -319,7 +318,7 @@ export default function LandingPage() {
       <footer className="border-t border-border/60">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-4 py-6 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <p className="flex items-center gap-2">
-            <IconTrophy className="size-4 text-amber-400" aria-hidden />
+            <img src="/podium-icon.svg" alt="Podium logo" className="size-5" />
             Podium · Built during the Builder.io Agent-Native Hackathon, Nov 2026.
           </p>
           <p>

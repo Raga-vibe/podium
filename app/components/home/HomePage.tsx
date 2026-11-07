@@ -6,7 +6,6 @@ import {
 import {
   IconCalendar,
   IconSparkles,
-  IconTrophy,
 } from "@tabler/icons-react";
 import { useState } from "react";
 import { Link } from "react-router";
@@ -230,7 +229,7 @@ export default function HomePage() {
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
       <header className="mb-6">
         <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight">
-          <IconTrophy className="size-7 text-amber-400" aria-hidden />
+          <img src="/podium-icon.svg" alt="Podium logo" className="size-8" />
           Podium
         </h1>
         <p className="mt-1 max-w-2xl text-muted-foreground">

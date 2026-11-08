@@ -3,6 +3,7 @@ import {
   useActionMutation,
   useActionQuery,
 } from "@agent-native/core/client/hooks";
+import { useSession } from "@agent-native/core/client/use-session";
 import {
   IconCalendar,
   IconSparkles,
@@ -227,6 +228,30 @@ export default function HomePage() {
   const seedStarter = useActionMutation("seed-podium");
   const seededRef = useRef(false);
   const listEmpty = hackathonsQuery.isSuccess && hackathons.length === 0;
+  const { session } = useSession();
+  const sessionEmail = session?.email ?? "";
+  const signinNoticeRef = useRef(false);
+
+  // No email provider is configured, so sign-up sends no mail. Show a
+  // one-time notice that the account is ready and they can sign in with
+  // the email and password they created. Once per user, stored in
+  // localStorage like the engine hint dismissal.
+  useEffect(() => {
+    if (!sessionEmail || signinNoticeRef.current) return;
+    signinNoticeRef.current = true;
+    const key = `podium:signin-notice-seen:${sessionEmail}`;
+    try {
+      if (window.localStorage.getItem(key)) return;
+      window.localStorage.setItem(key, "1");
+    } catch {
+      // Storage unavailable: still show the notice once per mount.
+    }
+    toast.success("Welcome to Podium", {
+      description:
+        "Your account is ready. You can sign in anytime with the email and password you created.",
+      duration: 10000,
+    });
+  }, [sessionEmail]);
 
   // First visit: a user with no boards meets the Builder.io starter board
   // automatically. It is their own copy, never shared. Anyone who already

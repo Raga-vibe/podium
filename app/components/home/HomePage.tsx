@@ -273,12 +273,31 @@ function BuilderConnectBanner() {
   );
 }
 
+/** The Hermes announcement URL, matching server/db/seed.ts. Kept here so Home can tell whether the Hermes board is missing without importing server code. */
+const HERMES_HACKATHON_URL =
+  "https://x.com/nousresearch/status/2118094256438936062";
+
+/** Compare hackathon URLs ignoring scheme, a leading www., casing and a trailing slash. */
+function sameHackathonUrl(a: string, b: string): boolean {
+  const normalize = (value: string) =>
+    value
+      .trim()
+      .toLowerCase()
+      .replace(/^https?:\/\//, "")
+      .replace(/^www\./, "")
+      .replace(/\/+$/, "");
+  return normalize(a) === normalize(b);
+}
+
 export default function HomePage() {
   const hackathonsQuery = useActionQuery("list-hackathons", {});
   const hackathons = hackathonsQuery.data?.hackathons ?? [];
   const seedStarter = useActionMutation("seed-podium");
   const seededRef = useRef(false);
   const listEmpty = hackathonsQuery.isSuccess && hackathons.length === 0;
+  const hasHermes = hackathons.some((h) =>
+    sameHackathonUrl(h.url, HERMES_HACKATHON_URL),
+  );
   const { session } = useSession();
   const sessionEmail = session?.email ?? "";
   const signinNoticeRef = useRef(false);
@@ -304,17 +323,21 @@ export default function HomePage() {
     });
   }, [sessionEmail]);
 
-  // First visit: a user with no boards meets the Builder.io starter board
-  // automatically. It is their own copy, never shared. Anyone who already
-  // has boards is left alone and starts fresh.
+  // Ensure the user has both starter boards: Builder.io and Hermes. A
+  // first-time user gets both; anyone missing the Hermes board gets it
+  // added, so the board list is general instead of Builder.io only. The
+  // seed is idempotent: it only creates a board that is missing. Note that
+  // clearing the Hermes board brings it back on the next Home visit, by
+  // design, so it stays on the board.
   useEffect(() => {
-    if (!listEmpty || seededRef.current) return;
+    if (!hackathonsQuery.isSuccess || seededRef.current) return;
+    if (hackathons.length > 0 && hasHermes) return;
     seededRef.current = true;
     seedStarter.mutate(
       {},
       { onSuccess: () => void hackathonsQuery.refetch() },
     );
-  }, [listEmpty]);
+  }, [hackathonsQuery.isSuccess, hackathons.length, hasHermes]);
 
   const seeding = listEmpty && (seedStarter.isPending || seedStarter.isSuccess);
 
@@ -338,11 +361,7 @@ export default function HomePage() {
         <ImportBar />
       </div>
 
-      <div className="mb-6">
-        <TodayCard />
-      </div>
-
-      <section aria-label="Hackathons">
+      <section aria-label="Hackathons" className="mb-6">
         {hackathonsQuery.isPending ? (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {[0, 1, 2].map((i) => (
@@ -368,10 +387,10 @@ export default function HomePage() {
         ) : seeding ? (
           <Card>
             <CardContent className="py-10 text-center">
-              <p className="font-medium">Setting up your first board…</p>
+              <p className="font-medium">Setting up your first boards…</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Your own Builder.io starter board is being created. It is
-                yours alone, no one else sees it.
+                Your own Builder.io and Hermes starter boards are being
+                created. They are yours alone, no one else sees them.
               </p>
             </CardContent>
           </Card>
@@ -393,6 +412,10 @@ export default function HomePage() {
           </div>
         )}
       </section>
+
+      <div className="mb-6">
+        <TodayCard />
+      </div>
     </div>
   );
 }

@@ -4,40 +4,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { askAgent } from "@/lib/podium";
 
-/** The OpenServ SERV Hackathon 02 page, offered as a one-click try-it import. */
+/** The OpenServ SERV Hackathon 02 page, pre-filled in the import box. */
 const OPENSERV_HACKATHON_URL = "https://www.openserv.ai/hackathon-2";
-
-/** The Nous Research Hermes Agent Plugin Hackathon announcement on X. */
-const HERMES_HACKATHON_URL =
-  "https://x.com/nousresearch/status/2118094256438936062";
 
 /**
  * Paste a hackathon URL. The UI never fetches or interprets the page itself:
  * it asks the agent to run rules-extraction, which calls fetch-hackathon-page
  * and save-hackathon. The board fills in live when the agent saves it.
+ *
+ * The input starts filled with the OpenServ Hackathon 02 page, so a judge
+ * only has to press Import hackathon. Hermes lives on the board itself as
+ * a starter board, not as a button here.
  */
 export function ImportBar() {
-  const [url, setUrl] = useState("");
+  const [url, setUrl] = useState(OPENSERV_HACKATHON_URL);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  function tryOpenserv() {
-    setError(null);
-    askAgent(
-      `Import this hackathon page into Podium using the rules-extraction skill: ${OPENSERV_HACKATHON_URL}. Extract the rules, deadlines, requirements, rubric and prizes, then save the hackathon.`,
-      { url: OPENSERV_HACKATHON_URL, skill: "rules-extraction" },
-    );
-    setSent(true);
-  }
-
-  function tryHermes() {
-    setError(null);
-    askAgent(
-      `Import this hackathon announcement into Podium using the rules-extraction skill: ${HERMES_HACKATHON_URL}. Extract the rules, deadlines, requirements, rubric and prizes, then save the hackathon.`,
-      { url: HERMES_HACKATHON_URL, skill: "rules-extraction" },
-    );
-    setSent(true);
-  }
 
   function submit(event: React.FormEvent) {
     event.preventDefault();
@@ -104,30 +86,11 @@ export function ImportBar() {
           if nothing shows up.
         </p>
       ) : (
-        <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-          <span>Try it:</span>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={tryOpenserv}
-          >
-            OpenServ Hackathon 02
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={tryHermes}
-          >
-            Hermes Plugin Hackathon
-          </Button>
-          <span>
-            or paste{" "}
-            <span className="font-medium text-foreground">builder.io/hackathon</span>{" "}
-            or any Devpost hackathon page.
-          </span>
-        </div>
+        <p className="mt-2 text-sm text-muted-foreground">
+          or paste{" "}
+          <span className="font-medium text-foreground">builder.io/hackathon</span>{" "}
+          or any Devpost hackathon page.
+        </p>
       )}
     </div>
   );

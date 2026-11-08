@@ -1,17 +1,18 @@
 import { defineAction } from "@agent-native/core/action";
 import { z } from "zod";
-import { seedBuilderHackathon } from "../server/db/seed.js";
+import { seedStarterBoards } from "../server/db/seed.js";
 
 export default defineAction({
   description:
-    "Ensure the current user has their own Builder.io Agent-Native Hackathon starter board. Creates it when they don't have one; does nothing when they already do. Boards are never shared, so every user gets their own copy.",
+    "Ensure the current user has both starter boards: the Builder.io Agent-Native Hackathon board and the Hermes Agent Plugin Hackathon board. Creates whichever is missing; does nothing for boards they already have. Boards are never shared, so every user gets their own copies.",
   schema: z.object({}),
   outputSchema: z.object({
-    seeded: z.boolean().describe("True when the seed record was created"),
-    reason: z.string().optional().describe("Why seeding was skipped, when seeded is false"),
-    hackathonId: z.string().optional().describe("Id of the seeded hackathon, when seeded is true"),
+    seeded: z.boolean().describe("True when at least one starter board was created"),
+    hackathonIds: z
+      .array(z.string())
+      .describe("Ids of the starter boards (Builder.io and Hermes)"),
   }),
   run: async () => {
-    return seedBuilderHackathon();
+    return seedStarterBoards();
   },
 });

@@ -22,6 +22,10 @@ type Owner = { ownerEmail: string; orgId: string | null };
 /** The hackathon page the starter board comes from. Its url identifies a user's Builder.io board. */
 export const SEED_HACKATHON_URL = "https://www.builder.io/hackathon";
 
+/** The Nous Research Hermes Agent Plugin Hackathon announcement on X. Its url identifies a user's Hermes board. */
+export const HERMES_HACKATHON_URL =
+  "https://x.com/nousresearch/status/2118094256438936062";
+
 /** Compare hackathon URLs ignoring scheme, a leading www., casing and a trailing slash. */
 function sameHackathonUrl(a: string, b: string): boolean {
   const normalize = (value: string) =>
@@ -99,9 +103,78 @@ const SEED_PROJECT = {
     "Turns any hackathon page into a live mission board and coaches the builder toward a winning entry.",
 };
 
-async function insertRequirements(tx: Tx, hackathonId: string, owner: Owner): Promise<void> {
+/** Hermes deadline: Nov 11, 2026 5:00 PM EST. */
+const HERMES_DEADLINE = "2026-11-11T22:00:00Z";
+
+/**
+ * Hermes starter requirements. These mirror the known entry shape from the
+ * announcement (plugin catalog entry plus a demo video), the same way the
+ * Builder.io seed uses generic-but-true rows; the agent can import the real
+ * rules from the announcement page to replace them.
+ */
+const HERMES_REQUIREMENTS: Array<{
+  title: string;
+  detail: string;
+  category: "build" | "demo" | "submission" | "eligibility";
+}> = [
+  {
+    title: "Build a Hermes agent plugin",
+    detail: "A plugin for the Hermes agent plugin catalog",
+    category: "build",
+  },
+  {
+    title: "Publish the plugin to the Hermes plugin catalog",
+    detail: "Entry is through the plugin catalog",
+    category: "submission",
+  },
+  {
+    title: "Record a demo video",
+    detail: "Show the plugin working end to end",
+    category: "demo",
+  },
+  {
+    title: "Submit before the deadline",
+    detail: "Nov 11, 2026 5:00 PM EST",
+    category: "submission",
+  },
+];
+
+/**
+ * The Hermes judging criteria from the announcement: usefulness, reliability,
+ * polish and creativity. No official weights are published, so they are
+ * split equally; the agent can correct them from the announcement page.
+ */
+const HERMES_RUBRIC: Array<{ name: string; weight: number; description: string }> = [
+  {
+    name: "Usefulness",
+    weight: 25,
+    description: "Does the plugin solve a real problem for Hermes users?",
+  },
+  {
+    name: "Reliability",
+    weight: 25,
+    description: "Does it work consistently and handle failures gracefully?",
+  },
+  {
+    name: "Polish",
+    weight: 25,
+    description: "How polished and well-presented is the plugin and its demo?",
+  },
+  {
+    name: "Creativity",
+    weight: 25,
+    description: "How original is the plugin idea?",
+  },
+];
+
+async function insertRequirements(
+  tx: Tx,
+  hackathonId: string,
+  owner: Owner,
+  reqs: typeof SEED_REQUIREMENTS,
+): Promise<void> {
   await tx.insert(requirements).values(
-    SEED_REQUIREMENTS.map((r, i) => ({
+    reqs.map((r, i) => ({
       id: crypto.randomUUID(),
       hackathonId,
       title: r.title,
@@ -117,9 +190,14 @@ async function insertRequirements(tx: Tx, hackathonId: string, owner: Owner): Pr
   );
 }
 
-async function insertRubric(tx: Tx, hackathonId: string, owner: Owner): Promise<void> {
+async function insertRubric(
+  tx: Tx,
+  hackathonId: string,
+  owner: Owner,
+  criteria: typeof SEED_RUBRIC,
+): Promise<void> {
   await tx.insert(rubricCriteria).values(
-    SEED_RUBRIC.map((c) => ({
+    criteria.map((c) => ({
       id: crypto.randomUUID(),
       hackathonId,
       name: c.name,
@@ -144,7 +222,7 @@ async function insertSeedRows(tx: Tx, hackathonId: string, owner: Owner): Promis
     ownerEmail: owner.ownerEmail,
     orgId: owner.orgId,
   });
-  await insertRequirements(tx, hackathonId, owner);
+  await insertRequirements(tx, hackathonId, owner, SEED_REQUIREMENTS);
   await tx.insert(milestones).values({
     id: crypto.randomUUID(),
     hackathonId,
@@ -153,7 +231,7 @@ async function insertSeedRows(tx: Tx, hackathonId: string, owner: Owner): Promis
     ownerEmail: owner.ownerEmail,
     orgId: owner.orgId,
   });
-  await insertRubric(tx, hackathonId, owner);
+  await insertRubric(tx, hackathonId, owner, SEED_RUBRIC);
   await tx.insert(projects).values({
     id: crypto.randomUUID(),
     hackathonId,
@@ -204,6 +282,86 @@ export async function seedBuilderHackathon(): Promise<{
   return { seeded: true, hackathonId };
 }
 
+async function insertHermesRows(tx: Tx, hackathonId: string, owner: Owner): Promise<void> {
+  await tx.insert(hackathons).values({
+    id: hackathonId,
+    name: "Hermes Agent Plugin Hackathon",
+    url: HERMES_HACKATHON_URL,
+    organizer: "Nous Research",
+    organizerTimezone: "America/New_York",
+    submissionDeadline: new Date(HERMES_DEADLINE),
+    prizeSummary: "$20,000 in prizes (see announcement for details)",
+    ownerEmail: owner.ownerEmail,
+    orgId: owner.orgId,
+  });
+  await insertRequirements(tx, hackathonId, owner, HERMES_REQUIREMENTS);
+  await tx.insert(milestones).values({
+    id: crypto.randomUUID(),
+    hackathonId,
+    label: "Submissions close",
+    at: new Date(HERMES_DEADLINE),
+    ownerEmail: owner.ownerEmail,
+    orgId: owner.orgId,
+  });
+  await insertRubric(tx, hackathonId, owner, HERMES_RUBRIC);
+  // No project row: the user's Hermes plugin is theirs to add, not Podium.
+}
+
+/** The current user's own Hermes board, if they have one. */
+async function findMyHermesBoard(ownerEmail: string): Promise<{ id: string } | null> {
+  const db = getDb();
+  const mine = await db
+    .select({ id: hackathons.id, url: hackathons.url })
+    .from(hackathons)
+    .where(eq(hackathons.ownerEmail, ownerEmail));
+  return mine.find((h) => sameHackathonUrl(h.url, HERMES_HACKATHON_URL)) ?? null;
+}
+
+/**
+ * Ensure the current user has their own Hermes board. Creates it (fresh id,
+ * owned by them) when they don't have one; does nothing when they already
+ * do. Mirrors the Builder.io starter board, so the board list is general.
+ */
+export async function seedHermesHackathon(): Promise<{
+  seeded: boolean;
+  reason?: string;
+  hackathonId?: string;
+}> {
+  const owner = getOwner();
+  const existing = await findMyHermesBoard(owner.ownerEmail);
+  if (existing) {
+    return {
+      seeded: false,
+      reason: "you already have the Hermes board",
+      hackathonId: existing.id,
+    };
+  }
+  const hackathonId = crypto.randomUUID();
+  const db = getDb();
+  await db.transaction(async (tx) => {
+    await insertHermesRows(tx, hackathonId, owner);
+  });
+  return { seeded: true, hackathonId };
+}
+
+/**
+ * Ensure the current user has both starter boards: Builder.io and Hermes.
+ * Creates whichever is missing; does nothing for boards they already have.
+ * This is what makes the board list general instead of Builder.io only.
+ */
+export async function seedStarterBoards(): Promise<{
+  seeded: boolean;
+  hackathonIds: string[];
+}> {
+  const builder = await seedBuilderHackathon();
+  const hermes = await seedHermesHackathon();
+  const hackathonIds = [
+    ...(builder.hackathonId ? [builder.hackathonId] : []),
+    ...(hermes.hackathonId ? [hermes.hackathonId] : []),
+  ];
+  return { seeded: builder.seeded || hermes.seeded, hackathonIds };
+}
+
 /**
  * Restore the current user's demo board to its fresh state, in place. The
  * board is their own Builder.io starter board, found by its hackathon URL;
@@ -242,7 +400,7 @@ export async function resetSeededHackathon(): Promise<{ hackathonId: string }> {
       .where(eq(requirements.hackathonId, hackathonId))
       .limit(1);
     if (remaining.length === 0) {
-      await insertRequirements(tx, hackathonId, owner);
+      await insertRequirements(tx, hackathonId, owner, SEED_REQUIREMENTS);
     }
     await tx.delete(scores).where(eq(scores.hackathonId, hackathonId));
     await tx.delete(drafts).where(eq(drafts.hackathonId, hackathonId));
@@ -260,7 +418,7 @@ export async function resetSeededHackathon(): Promise<{ hackathonId: string }> {
       orgId: owner.orgId,
     });
     await tx.delete(rubricCriteria).where(eq(rubricCriteria.hackathonId, hackathonId));
-    await insertRubric(tx, hackathonId, owner);
+    await insertRubric(tx, hackathonId, owner, SEED_RUBRIC);
   });
   return { hackathonId };
 }

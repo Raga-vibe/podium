@@ -3,13 +3,14 @@ import {
   useActionMutation,
   useActionQuery,
 } from "@agent-native/core/client/hooks";
+import { agentEngineStatusUrlForChatApi } from "@agent-native/core/client/agent-chat";
 import { useSession } from "@agent-native/core/client/use-session";
 import {
   IconCalendar,
   IconSparkles,
 } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { toast } from "sonner";
 
 import { ImportBar } from "@/components/podium/ImportBar";
@@ -222,6 +223,84 @@ function TodayCard() {
   );
 }
 
+const BUILDER_BANNER_DISMISSED_KEY = "podium.builder-connect-banner.dismissed";
+
+/**
+ * Prominent banner for users whose agent is not on Builder.io. The
+ * deployment Gemini key is at capacity, so new users need a Builder.io
+ * connection for the agent to work without limits. Dismissible, and hidden
+ * once they switch to Builder.io.
+ */
+function BuilderConnectBanner() {
+  const navigate = useNavigate();
+  const [engine, setEngine] = useState<string | null>(null);
+  const [dismissed, setDismissed] = useState(false);
+
+  useEffect(() => {
+    try {
+      if (window.localStorage.getItem(BUILDER_BANNER_DISMISSED_KEY) === "1") {
+        setDismissed(true);
+        return;
+      }
+    } catch {
+      // Storage unavailable: the banner still renders, just not dismissible.
+    }
+    let cancelled = false;
+    fetch(agentEngineStatusUrlForChatApi(), { credentials: "include" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && typeof data?.engine === "string") {
+          setEngine(data.engine);
+        }
+      })
+      .catch(() => {
+        // Status unreadable: stay hidden rather than guess the engine.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (dismissed || !engine || engine === "builder") return null;
+
+  return (
+    <Card className="mb-6 border-amber-400/60 bg-amber-400/10">
+      <CardContent className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <p className="font-medium">Connect Builder.io to use the agent</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            The built-in Gemini is at capacity right now. Connect your
+            Builder.io account for the full agent experience, without limits.
+          </p>
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          <Button onClick={() => navigate("/settings/model")}>
+            Connect Builder.io
+          </Button>
+          <button
+            type="button"
+            aria-label="Dismiss Builder.io recommendation"
+            className="rounded-md px-2 py-1 text-muted-foreground hover:text-foreground"
+            onClick={() => {
+              try {
+                window.localStorage.setItem(
+                  BUILDER_BANNER_DISMISSED_KEY,
+                  "1",
+                );
+              } catch {
+                // Ignore storage errors; the state update still hides it.
+              }
+              setDismissed(true);
+            }}
+          >
+            ×
+          </button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function HomePage() {
   const hackathonsQuery = useActionQuery("list-hackathons", {});
   const hackathons = hackathonsQuery.data?.hackathons ?? [];
@@ -280,6 +359,8 @@ export default function HomePage() {
           thinking.
         </p>
       </header>
+
+      <BuilderConnectBanner />
 
       <div className="mb-6">
         <ImportBar />

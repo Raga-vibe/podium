@@ -223,28 +223,18 @@ function TodayCard() {
   );
 }
 
-const BUILDER_BANNER_DISMISSED_KEY = "podium.builder-connect-banner.dismissed";
-
 /**
  * Prominent banner for users whose agent is not on Builder.io. The
  * deployment Gemini key is at capacity, so new users need a Builder.io
- * connection for the agent to work without limits. Dismissible, and hidden
- * once they switch to Builder.io.
+ * connection for the agent to work without limits. It is not dismissible:
+ * it stays on Home for everyone not on Builder.io, and hides only once
+ * they connect Builder.io.
  */
 function BuilderConnectBanner() {
   const navigate = useNavigate();
   const [engine, setEngine] = useState<string | null>(null);
-  const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    try {
-      if (window.localStorage.getItem(BUILDER_BANNER_DISMISSED_KEY) === "1") {
-        setDismissed(true);
-        return;
-      }
-    } catch {
-      // Storage unavailable: the banner still renders, just not dismissible.
-    }
     let cancelled = false;
     fetch(agentEngineStatusUrlForChatApi(), { credentials: "include" })
       .then((res) => (res.ok ? res.json() : null))
@@ -261,7 +251,7 @@ function BuilderConnectBanner() {
     };
   }, []);
 
-  if (dismissed || !engine || engine === "builder") return null;
+  if (!engine || engine === "builder") return null;
 
   return (
     <Card className="mb-6 border-amber-400/60 bg-amber-400/10">
@@ -277,24 +267,6 @@ function BuilderConnectBanner() {
           <Button onClick={() => navigate("/settings/model")}>
             Connect Builder.io
           </Button>
-          <button
-            type="button"
-            aria-label="Dismiss Builder.io recommendation"
-            className="rounded-md px-2 py-1 text-muted-foreground hover:text-foreground"
-            onClick={() => {
-              try {
-                window.localStorage.setItem(
-                  BUILDER_BANNER_DISMISSED_KEY,
-                  "1",
-                );
-              } catch {
-                // Ignore storage errors; the state update still hides it.
-              }
-              setDismissed(true);
-            }}
-          >
-            ×
-          </button>
         </div>
       </CardContent>
     </Card>

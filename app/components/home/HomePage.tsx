@@ -46,7 +46,7 @@ function HackathonCard({ hackathon }: { hackathon: HackathonSummary }) {
   return (
     <Link
       to={`/hackathon/${hackathon.id}`}
-      className="group block rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+      className="group block min-w-0 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
       aria-label={`${hackathon.name}, open mission board`}
     >
       <Card className="h-full transition-colors group-hover:border-amber-400/60">
@@ -363,7 +363,7 @@ export default function HomePage() {
 
       <section aria-label="Hackathons" className="mb-6">
         {hackathonsQuery.isPending ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {[0, 1, 2].map((i) => (
               <Skeleton key={i} className="h-44 w-full rounded-xl" />
             ))}
@@ -405,7 +405,7 @@ export default function HomePage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {hackathons.map((hackathon) => (
               <HackathonCard key={hackathon.id} hackathon={hackathon} />
             ))}

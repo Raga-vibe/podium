@@ -108,7 +108,7 @@ function BoardPreview() {
         <span className="size-2.5 rounded-full bg-red-400/70" />
         <span className="size-2.5 rounded-full bg-amber-400/70" />
         <span className="size-2.5 rounded-full bg-emerald-400/70" />
-        <span className="ml-2 truncate rounded-md bg-muted px-3 py-1 text-xs text-muted-foreground">
+        <span className="ml-2 min-w-0 truncate rounded-md bg-muted px-3 py-1 text-xs text-muted-foreground">
           podium-82hb.onrender.com
         </span>
       </div>
@@ -185,7 +185,7 @@ const FEATURES = [
     body: "Deadlines and milestones as a standard .ics file with 24-hour and 2-hour alerts. Works in Google, Apple and Outlook calendars.",
   },
   {
-    title: "One shared board",
+    title: "You and the agent, one board",
     body: "You and the agent read and write the same data. Whatever you tick, the agent sees. Whatever the agent drafts, you see.",
   },
   {
@@ -203,8 +203,8 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-40 border-b border-border/60 bg-background/90 backdrop-blur">
-        <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-          <Link to="/" className="flex items-center gap-2 font-bold tracking-tight">
+        <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6">
+          <Link to="/" className="flex shrink-0 items-center gap-2 font-bold tracking-tight">
             <img src="/podium-icon.svg" alt="Podium logo" className="size-6" />
             Podium
           </Link>
@@ -213,7 +213,7 @@ export default function LandingPage() {
             <a href="#features" className="hover:text-foreground">Features</a>
             <a href={REPO_URL} target="_blank" rel="noreferrer" className="hover:text-foreground">Open source</a>
           </nav>
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
             <Button variant="ghost" size="sm" asChild>
               <Link to="/home">Sign in</Link>
             </Button>
@@ -230,9 +230,9 @@ export default function LandingPage() {
         <section className="mx-auto w-full max-w-6xl px-4 pt-14 pb-10 sm:px-6 sm:pt-20">
           <div className="grid items-center gap-10 lg:grid-cols-2">
             <div>
-              <p className="inline-flex items-center gap-2 rounded-full border border-amber-400/30 bg-amber-400/10 px-3 py-1 text-xs font-medium text-amber-300">
-                <IconSparkles className="size-3.5" aria-hidden />
-                Built for the Builder.io Agent-Native Hackathon
+              <p className="inline-flex max-w-full items-center gap-2 rounded-full border border-amber-400/30 bg-amber-400/10 px-3 py-1 text-xs font-medium text-amber-300">
+                <IconSparkles className="size-3.5 shrink-0" aria-hidden />
+                Builder.io Agent-Native Hackathon
               </p>
               <h1 className="mt-5 text-4xl leading-tight font-bold tracking-tight sm:text-5xl lg:text-6xl">
                 Turn any hackathon page into a live mission board.
@@ -295,7 +295,7 @@ export default function LandingPage() {
           <div className="flex flex-col items-start justify-between gap-6 rounded-2xl border border-amber-400/30 bg-amber-400/5 p-6 sm:p-8 lg:flex-row lg:items-center">
             <div>
               <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
-                <IconCalendar className="size-6 text-amber-400" aria-hidden />
+                <IconCalendar className="size-6 shrink-0 text-amber-400" aria-hidden />
                 Your next deadline is closer than you think.
               </h2>
               <p className="mt-2 max-w-xl text-muted-foreground">

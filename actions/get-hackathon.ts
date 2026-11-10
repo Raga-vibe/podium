@@ -24,18 +24,12 @@ import {
 } from "../server/db/schema.js";
 import { projectOutputSchema } from "./save-project.js";
 import { scoreOutputSchema } from "./save-scores.js";
+import { requirementOutputSchema } from "./add-requirement.js";
 
-const requirementSchema = z.object({
-  id: z.string(),
-  hackathonId: z.string(),
-  title: z.string(),
-  detail: z.string().nullable(),
-  category: z.string(),
-  done: z.boolean(),
-  source: z.string(),
-  status: z.string(),
-  order: z.number(),
-});
+// The board detail reuses the shared requirement shape (including its
+// explicit lifecycle `state`) so get-hackathon can never drift from the
+// canonical requirement output. Do not inline a second copy here.
+const requirementSchema = requirementOutputSchema;
 const milestoneSchema = z.object({
   id: z.string(),
   hackathonId: z.string(),

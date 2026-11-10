@@ -186,9 +186,12 @@ export default function Root() {
   // The path, not the visitor, picks the shell, so the SSR shell stays one
   // cached page per URL.
   const { pathname } = useLocation();
-  // The landing page is public: signed-out visitors must reach it instead of
-  // being sent to sign-in by the session gate.
-  const isLanding = pathname === "/";
+  // The landing page and the guest demo are public: signed-out visitors must
+  // reach them instead of being sent to sign-in by the session gate. /guest
+  // signs the visitor in as the shared demo account on mount, so the gate
+  // must not redirect before that login runs. (The server allows both via
+  // workspaceAppPublicPaths in server/plugins/auth.ts.)
+  const isPublicPath = pathname === "/" || pathname === "/guest";
   return (
     <AppToolkitProvider>
       <AppProviders
@@ -196,7 +199,7 @@ export default function Root() {
         skeletonLayout={skeletonLayoutForPath(pathname)}
         defaultTheme="dark"
         i18n={{ catalog: i18nCatalog }}
-        isPublicPath={isLanding}
+        isPublicPath={isPublicPath}
       >
         <DbSyncSetup />
         <AppContent />

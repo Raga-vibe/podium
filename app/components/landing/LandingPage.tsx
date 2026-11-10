@@ -215,6 +215,9 @@ export default function LandingPage() {
           </nav>
           <div className="flex shrink-0 items-center gap-2">
             <Button variant="ghost" size="sm" asChild>
+              <Link to="/guest">Try the demo</Link>
+            </Button>
+            <Button variant="ghost" size="sm" asChild>
               <Link to="/home">Sign in</Link>
             </Button>
             <Button size="sm" asChild className="bg-amber-400 font-semibold text-zinc-950 hover:bg-amber-300">
@@ -247,6 +250,9 @@ export default function LandingPage() {
                   <Link to="/home">
                     Get started <IconArrowRight className="size-4" aria-hidden />
                   </Link>
+                </Button>
+                <Button size="lg" variant="outline" asChild>
+                  <Link to="/guest">Try the demo</Link>
                 </Button>
                 <Button size="lg" variant="outline" asChild>
                   <a href={REPO_URL} target="_blank" rel="noreferrer">

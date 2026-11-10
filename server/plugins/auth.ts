@@ -4,7 +4,7 @@ import {
 } from "@agent-native/toolkit/app/auth/server";
 
 export default createToolkitAuthPlugin({
-  workspaceAppPublicPaths: ["/"],
+  workspaceAppPublicPaths: ["/", "/guest"],
   // The landing page lives at "/": with rootAuth on, the framework's server
   // auth guard serves the sign-in page at "/" before React Router ever runs,
   // so no client-side change can make the landing page visible. Off means

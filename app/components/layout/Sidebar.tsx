@@ -20,6 +20,7 @@ import {
   IconLayoutSidebarLeftExpand,
   IconLoader2,
   IconSearch,
+  IconWorld,
 } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
@@ -146,6 +147,37 @@ function HomeNavLink({ collapsed }: { collapsed: boolean }) {
       <Tooltip>
         <TooltipTrigger asChild>{link}</TooltipTrigger>
         <TooltipContent side="right">{t("navigation.home")}</TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return <div className="px-2">{link}</div>;
+}
+
+/** Link to the public landing page. Signed-in users are normally bounced to
+ * /home, so this goes to /?preview=1, which shows the landing page itself. */
+function LandingPageNavLink({ collapsed }: { collapsed: boolean }) {
+  const link = (
+    <Link
+      to="/?preview=1"
+      aria-label={collapsed ? "Landing page" : undefined}
+      className={cn(
+        "flex items-center text-sidebar-accent-foreground transition-colors hover:bg-sidebar-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring",
+        collapsed
+          ? "size-8 justify-center rounded-md"
+          : "h-8 w-full gap-3 rounded-lg px-3 text-sm font-medium",
+      )}
+    >
+      <IconWorld className="size-4 shrink-0" strokeWidth={1.8} />
+      <span className={collapsed ? "sr-only" : "truncate"}>Landing page</span>
+    </Link>
+  );
+
+  if (collapsed) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>{link}</TooltipTrigger>
+        <TooltipContent side="right">Landing page</TooltipContent>
       </Tooltip>
     );
   }
@@ -408,6 +440,7 @@ export function Sidebar({
         )}
       >
         <HomeNavLink collapsed={collapsed} />
+        <LandingPageNavLink collapsed={collapsed} />
         <ChatThreadsSection collapsed={collapsed} />
       </nav>
 

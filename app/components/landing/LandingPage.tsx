@@ -7,7 +7,7 @@ import {
   IconSparkles,
 } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
-import { Link, Navigate } from "react-router";
+import { Link, Navigate, useSearchParams } from "react-router";
 
 import { Button } from "@/components/ui/button";
 
@@ -196,7 +196,12 @@ const FEATURES = [
 
 export default function LandingPage() {
   const { status } = useSession();
-  if (status === "authenticated") {
+  const [searchParams] = useSearchParams();
+  // Signed-in visitors are sent to /home, so there is no way back to this
+  // page from inside the app. ?preview=1 skips the redirect, letting a
+  // signed-in user (or judge) view the landing page itself.
+  const preview = searchParams.get("preview") === "1";
+  if (status === "authenticated" && !preview) {
     return <Navigate to="/home" replace />;
   }
 

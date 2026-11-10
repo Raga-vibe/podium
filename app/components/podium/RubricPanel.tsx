@@ -78,6 +78,11 @@ function CriterionCard({
               Weakest
             </span>
           ) : null}
+          {score?.state === "disputed" ? (
+            <span className="ml-2 rounded-full bg-sky-400/15 px-2 py-0.5 text-xs font-semibold text-sky-300">
+              Disputed — awaiting rescore
+            </span>
+          ) : null}
         </p>
         <p className="shrink-0 text-sm text-muted-foreground">
           {score ? (

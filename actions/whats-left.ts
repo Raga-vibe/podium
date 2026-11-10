@@ -23,7 +23,7 @@ export default defineAction({
     open: z
       .array(requirementOutputSchema)
       .describe(
-        "Open requirements in board order: Build, then Demo, then Submission, then Eligibility; within a group, in board order. Each item includes its status (proposed or accepted), so items still waiting for approval can be mentioned.",
+        "Open requirements in board order: Build, then Demo, then Submission, then Eligibility; within a group, in board order. Each item includes its lifecycle state (proposed, open or done), so items still waiting for approval can be mentioned by their state, not by combining status and done.",
       ),
     deadline: z.string().nullable().describe("Submission deadline as an ISO string, or null"),
     timeLeft: z

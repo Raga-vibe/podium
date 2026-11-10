@@ -15,6 +15,9 @@ export const requirementOutputSchema = z.object({
   done: z.boolean().describe("Whether the requirement is done"),
   source: z.string().describe("Who created it: agent or user"),
   status: z.string().describe("Status: proposed or accepted"),
+  state: z
+    .enum(["proposed", "open", "done"])
+    .describe("Lifecycle state: proposed (agent suggestion awaiting review), open (accepted, not done), or done. Read this, not status + done."),
   order: z.number().describe("Position on the board"),
 });
 

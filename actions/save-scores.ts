@@ -19,12 +19,15 @@ export const scoreOutputSchema = z.object({
   topFix: z.string().nullable().describe("Single highest-impact fix, or null"),
   userNote: z.string().nullable().describe("User disagreement note, or null"),
   previousScore: z.number().nullable().describe("Score this replaced, or null when first scored"),
+  state: z
+    .enum(["scored", "disputed", "rescored"])
+    .describe("Lifecycle state: scored (fresh), disputed (carries the user's disagreement note, awaiting rescore), or rescored (replaced an earlier score). Read this, not userNote + previousScore."),
   createdAt: z.string().nullable().describe("Creation time as an ISO string"),
 });
 
 export default defineAction({
   description:
-    "Store per-criterion rubric scores (0-10) for a hackathon and compute the weighted total. Rescoring a criterion replaces its old score but keeps the user's note and records the old score as previousScore, so the change shows with a before and after.",
+    "Store per-criterion rubric scores (0-10) for a hackathon and compute the weighted total. Rescoring a criterion replaces its old score, records the old score as previousScore, and clears the user's disagreement note, because the rescore is the answer to that dispute (see server/db/states.ts). The change shows with a before and after.",
   schema: z.object({
     hackathonId: z.string().describe("Hackathon id"),
     scores: z
@@ -70,7 +73,10 @@ export default defineAction({
           .from(scores)
           .where(eq(scores.criterionId, s.criterionId))
           .limit(1);
-        const userNote = existing?.userNote ?? null;
+        // The old note was a disagreement with the old score. The rescore
+        // answers it, so it is cleared: otherwise the rescored criterion
+        // would still carry the old note and still look disputed.
+        const userNote = null;
         const previousScore = existing?.score ?? null;
         if (existing) {
           await tx.delete(scores).where(eq(scores.id, existing.id));

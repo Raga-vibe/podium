@@ -178,6 +178,11 @@ function RequirementRow({
               <IconRobot className="size-3" aria-hidden /> agent
             </span>
           ) : null}
+          {requirement.state === "proposed" ? (
+            <span className="inline-flex items-center rounded-full bg-sky-400/15 px-2 py-0.5 font-medium text-sky-300">
+              Needs review
+            </span>
+          ) : null}
           {requirement.status === "proposed" ? (
             <>
               <Button

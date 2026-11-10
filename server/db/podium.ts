@@ -8,6 +8,7 @@ import type {
   rubricCriteria,
   scores,
 } from "./schema.js";
+import { requirementState, scoreState } from "./states.js";
 
 export type HackathonRow = typeof hackathons.$inferSelect;
 export type RequirementRow = typeof requirements.$inferSelect;
@@ -45,6 +46,10 @@ export function serializeRequirement(r: RequirementRow) {
     done: r.done,
     source: r.source,
     status: r.status,
+    // Explicit lifecycle state (see server/db/states.ts): "proposed" (agent
+    // suggestion awaiting review), "open" (accepted, not done), "done".
+    // Derived from status + done so the UI and the agent read one field.
+    state: requirementState(r.status, r.done),
     order: r.order,
   };
 }
@@ -90,6 +95,11 @@ export function serializeScore(r: ScoreRow) {
     topFix: r.topFix,
     userNote: r.userNote,
     previousScore: r.previousScore,
+    // Explicit lifecycle state (see server/db/states.ts): "scored" (fresh),
+    // "disputed" (carries the user's disagreement note, awaiting rescore),
+    // "rescored" (replaced an earlier score; the dispute note is cleared
+    // on rescore, so it no longer looks disputed).
+    state: scoreState(r),
     createdAt: iso(r.createdAt),
   };
 }

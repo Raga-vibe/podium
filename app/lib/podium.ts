@@ -27,6 +27,8 @@ export interface Requirement {
   done: boolean;
   source: string;
   status: string;
+  /** Explicit lifecycle state (see server/db/states.ts): proposed (awaiting review), open (accepted, not done), or done. */
+  state?: "proposed" | "open" | "done";
   order: number;
 }
 
@@ -64,6 +66,8 @@ export interface Score {
   topFix: string | null;
   userNote: string | null;
   previousScore: number | null;
+  /** Explicit lifecycle state (see server/db/states.ts): scored (fresh), disputed (carries the disagreement note, awaiting rescore), or rescored. */
+  state?: "scored" | "disputed" | "rescored";
   createdAt: string | null;
 }
 

@@ -14,6 +14,9 @@ const scoreOutputSchema = z.object({
   rationale: z.string().nullable().describe("One-line rationale, or null"),
   topFix: z.string().nullable().describe("Single highest-impact fix, or null"),
   userNote: z.string().nullable().describe("User disagreement note, or null"),
+  state: z
+    .enum(["scored", "disputed", "rescored"])
+    .describe("Lifecycle state: scored (fresh), disputed (carries the user's disagreement note, awaiting rescore), or rescored (replaced an earlier score)."),
   createdAt: z.string().nullable().describe("Creation time as an ISO string"),
 });
 

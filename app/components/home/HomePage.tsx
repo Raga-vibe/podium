@@ -226,13 +226,14 @@ function TodayCard() {
 /**
  * Prominent banner for users whose agent is not on Builder.io. The
  * deployment Gemini key is at capacity, so new users need a Builder.io
- * connection for the agent to work without limits. It is not dismissible:
- * it stays on Home for everyone not on Builder.io, and hides only once
- * they connect Builder.io.
+ * connection for the agent to work without limits. It shows for 30 seconds
+ * per Home visit, then hides itself so it stops distracting from the boards,
+ * and it hides for good once they connect Builder.io.
  */
 function BuilderConnectBanner() {
   const navigate = useNavigate();
   const [engine, setEngine] = useState<string | null>(null);
+  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -251,7 +252,16 @@ function BuilderConnectBanner() {
     };
   }, []);
 
-  if (!engine || engine === "builder") return null;
+  // Auto-hide 30 seconds after the banner appears, so it nudges without
+  // lingering over the boards. It shows again on the next Home visit.
+  const shown = Boolean(engine && engine !== "builder");
+  useEffect(() => {
+    if (!shown) return;
+    const timer = setTimeout(() => setVisible(false), 30_000);
+    return () => clearTimeout(timer);
+  }, [shown]);
+
+  if (!shown || !visible) return null;
 
   return (
     <Card className="mb-6 border-amber-400/60 bg-amber-400/10">

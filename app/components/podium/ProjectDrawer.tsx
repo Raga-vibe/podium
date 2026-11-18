@@ -145,7 +145,7 @@ export function ProjectDrawer({
           <Button
             type="submit"
             disabled={save.isPending}
-            className="w-full bg-amber-400 font-semibold text-zinc-950 hover:bg-amber-300"
+            className="w-full rounded-full bg-amber-400 font-semibold text-white hover:bg-amber-300"
           >
             {save.isPending ? "Saving…" : "Save project"}
           </Button>

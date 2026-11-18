@@ -143,7 +143,7 @@ function CriterionCard({
               <Button
                 type="submit"
                 size="sm"
-                className="h-8 bg-amber-400 font-semibold text-zinc-950 hover:bg-amber-300"
+                className="h-8 rounded-full bg-amber-400 font-semibold text-white hover:bg-amber-300"
                 disabled={addNote.isPending || note.trim().length === 0}
               >
                 Rescore
@@ -241,7 +241,7 @@ export function RubricPanel({
         </p>
         <Button
           size="sm"
-          className="bg-amber-400 font-semibold text-zinc-950 hover:bg-amber-300"
+          className="rounded-full bg-amber-400 font-semibold text-white hover:bg-amber-300"
           onClick={() =>
             askAgent(
               `Score my project for the hackathon "${hackathonName}" using the rubric-coach skill. Score every criterion honestly against the project and rubric, then save the scores.`,

@@ -374,7 +374,7 @@ export function MissionBoard({
         <Button
           type="submit"
           disabled={add.isPending || title.trim().length === 0}
-          className="h-10 bg-amber-400 font-semibold text-zinc-950 hover:bg-amber-300"
+          className="h-10 rounded-full bg-amber-400 font-semibold text-white hover:bg-amber-300"
         >
           <IconPlus className="size-4" aria-hidden /> Add
         </Button>

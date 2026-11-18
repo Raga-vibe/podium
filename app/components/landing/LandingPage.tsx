@@ -45,7 +45,7 @@ function MockBoard() {
             <span
               className={`flex size-5 shrink-0 items-center justify-center rounded-full border ${
                 item.done
-                  ? "border-amber-400 bg-amber-400 text-zinc-950"
+                  ? "border-amber-400 bg-amber-400 text-white"
                   : "border-muted-foreground/40"
               }`}
             >
@@ -225,7 +225,7 @@ export default function LandingPage() {
             <Button variant="ghost" size="sm" asChild>
               <Link to="/home">Sign in</Link>
             </Button>
-            <Button size="sm" asChild className="bg-amber-400 font-semibold text-zinc-950 hover:bg-amber-300">
+            <Button size="sm" asChild className="rounded-full bg-amber-400 font-semibold text-white hover:bg-amber-300">
               <Link to="/home">
                 Get started <IconArrowRight className="size-4" aria-hidden />
               </Link>
@@ -242,7 +242,7 @@ export default function LandingPage() {
                 <IconSparkles className="size-3.5 shrink-0" aria-hidden />
                 Builder.io Agent-Native Hackathon
               </p>
-              <h1 className="mt-5 text-4xl leading-tight font-bold tracking-tight sm:text-5xl lg:text-6xl">
+              <h1 className="font-display mt-5 text-4xl leading-tight font-normal tracking-tight sm:text-5xl lg:text-6xl">
                 Turn any hackathon page into a live mission board.
               </h1>
               <p className="mt-4 max-w-xl text-lg text-muted-foreground">
@@ -251,7 +251,7 @@ export default function LandingPage() {
                 coached toward a winning entry, then draft the submission.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <Button size="lg" asChild className="bg-amber-400 font-semibold text-zinc-950 hover:bg-amber-300">
+                <Button size="lg" asChild className="rounded-full bg-amber-400 font-semibold text-white hover:bg-amber-300">
                   <Link to="/home">
                     Get started <IconArrowRight className="size-4" aria-hidden />
                   </Link>
@@ -277,7 +277,7 @@ export default function LandingPage() {
         </section>
 
         <section id="how-it-works" className="mx-auto w-full max-w-6xl scroll-mt-20 px-4 py-10 sm:px-6">
-          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">How it works</h2>
+          <h2 className="font-display text-2xl font-normal tracking-tight sm:text-3xl">How it works</h2>
           <div className="mt-6 grid gap-4 md:grid-cols-3">
             {STEPS.map((step) => (
               <article key={step.n} className="rounded-xl border border-border bg-card p-5">
@@ -291,7 +291,7 @@ export default function LandingPage() {
         </section>
 
         <section id="features" className="mx-auto w-full max-w-6xl scroll-mt-20 px-4 py-10 sm:px-6">
-          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">Everything you need to ship</h2>
+          <h2 className="font-display text-2xl font-normal tracking-tight sm:text-3xl">Everything you need to ship</h2>
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map((feature) => (
               <article key={feature.title} className="rounded-xl border border-border bg-card p-5">
@@ -317,7 +317,7 @@ export default function LandingPage() {
                 , and it works for yours too.
               </p>
             </div>
-            <Button size="lg" asChild className="shrink-0 bg-amber-400 font-semibold text-zinc-950 hover:bg-amber-300">
+            <Button size="lg" asChild className="shrink-0 rounded-full bg-amber-400 font-semibold text-white hover:bg-amber-300">
               <Link to="/home">
                 Get started <IconArrowRight className="size-4" aria-hidden />
               </Link>

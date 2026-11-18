@@ -69,7 +69,7 @@ export function DraftPanel({
     <div>
       <div className="mb-3 flex flex-wrap gap-2">
         <Button
-          className="bg-amber-400 font-semibold text-zinc-950 hover:bg-amber-300"
+          className="rounded-full bg-amber-400 font-semibold text-white hover:bg-amber-300"
           onClick={() =>
             askAgent(
               `Draft my submission for the hackathon "${hackathonName}" using the submission-writer skill. Write the submission description plus the "built during the event" disclosure from the board and project, then save the draft.`,

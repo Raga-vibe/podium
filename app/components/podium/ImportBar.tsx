@@ -4,9 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { askAgent } from "@/lib/podium";
 
-/** The OpenServ SERV Hackathon 02 page, pre-filled in the import box. */
-const OPENSERV_HACKATHON_URL = "https://www.openserv.ai/hackathon-2";
-
 /**
  * How long the import may sit in "sent" before the UI admits it may have
  * stalled and lets the user try again. The import itself is fire-and-forget
@@ -21,12 +18,11 @@ const IMPORT_TIMEOUT_MS = 90_000;
  * it asks the agent to run rules-extraction, which calls fetch-hackathon-page
  * and save-hackathon. The board fills in live when the agent saves it.
  *
- * The input starts filled with the OpenServ Hackathon 02 page, so a judge
- * only has to press Import hackathon. Hermes lives on the board itself as
- * a starter board, not as a button here.
+ * The input starts empty. Hermes lives on the board itself as a starter
+ * board, not as a button here.
  */
 export function ImportBar() {
-  const [url, setUrl] = useState(OPENSERV_HACKATHON_URL);
+  const [url, setUrl] = useState("");
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [timedOut, setTimedOut] = useState(false);
@@ -83,7 +79,7 @@ export function ImportBar() {
         <Button
           type="submit"
           disabled={sent && !timedOut}
-          className="h-11 bg-amber-400 px-5 font-semibold text-zinc-950 hover:bg-amber-300 disabled:opacity-60"
+          className="h-11 rounded-full bg-[#ff4800] px-5 font-semibold text-white hover:bg-[#ff5e23] disabled:opacity-60"
         >
           {sent && !timedOut ? "Import sent…" : "Import hackathon"}
         </Button>

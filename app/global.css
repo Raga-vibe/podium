@@ -1,7 +1,22 @@
 @import "@fontsource-variable/inter";
+@import "@fontsource-variable/space-grotesk";
 
 @import "tailwindcss";
 @import "@agent-native/toolkit/styles.css";
+
+@theme {
+  /* Linearity accent: the app's amber accent utilities render as
+     Signal Orange (#ff4800) and Ember (#ff5e23). */
+  --color-amber-300: #ff5e23;
+  --color-amber-400: #ff4800;
+  --color-signal-orange: #ff4800;
+  --color-ember: #ff5e23;
+  --color-void: #000000;
+  --color-near-black: #050505;
+  --color-carbon: #292929;
+  --color-electric-yellow: #ffd900;
+  --font-display: "Space Grotesk Variable", "Space Grotesk", "Inter Variable", sans-serif;
+}
 
 @source "./**/*.{ts,tsx}";
 
@@ -229,34 +244,53 @@
 }
 
 .dark {
-  --background: 0 0% 13%;
-  --foreground: 0 0% 90%;
-  --card: 0 0% 16.47%;
-  --card-foreground: 0 0% 90%;
-  --popover: 0 0% 15%;
-  --popover-foreground: 0 0% 90%;
-  --primary: 0 0% 75%;
-  --primary-foreground: 0 0% 10%;
-  --secondary: 0 0% 18%;
-  --secondary-foreground: 0 0% 90%;
+  /* Linearity theme: Void canvas, Signal Orange primary, hairline borders. */
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
+  --card: 0 0% 2%;
+  --card-foreground: 0 0% 100%;
+  --popover: 0 0% 16%;
+  --popover-foreground: 0 0% 100%;
+  --primary: 17 100% 50%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 16%;
+  --secondary-foreground: 0 0% 100%;
   --muted: 0 0% 16%;
   --muted-foreground: 0 0% 60%;
-  --accent: 0 0% 18%;
-  --accent-foreground: 0 0% 90%;
+  --accent: 17 100% 50%;
+  --accent-foreground: 0 0% 100%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 98%;
-  --border: 0 0% 24%;
-  --input: 0 0% 24%;
-  --ring: 0 0% 60%;
+  --border: 0 0% 20%;
+  --input: 0 0% 16%;
+  --ring: 17 100% 50%;
   --radius: 0.5rem;
-  --sidebar-background: 0 0% 10%;
+  --sidebar-background: 0 0% 0%;
   --sidebar-foreground: 0 0% 60%;
-  --sidebar-primary: 0 0% 75%;
-  --sidebar-primary-foreground: 0 0% 10%;
+  --sidebar-primary: 17 100% 50%;
+  --sidebar-primary-foreground: 0 0% 100%;
   --sidebar-accent: 0 0% 16%;
-  --sidebar-accent-foreground: 0 0% 90%;
-  --sidebar-border: 0 0% 20%;
-  --sidebar-ring: 0 0% 60%;
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-border: 0 0% 16%;
+  --sidebar-ring: 17 100% 50%;
+}
+
+/* Linearity design tokens (see docs/design/linearity-tokens.json). */
+:root {
+  --color-void: #000000;
+  --color-near-black: #050505;
+  --color-carbon: #292929;
+  --color-graphite: #4d4d4d;
+  --color-ash: #666666;
+  --color-steel: #808080;
+  --color-fog: #999999;
+  --color-silver: #bfbfbf;
+  --color-white: #ffffff;
+  --color-signal-orange: #ff4800;
+  --color-ember: #ff5e23;
+  --color-burnt-orange: #ca4e17;
+  --color-electric-yellow: #ffd900;
+  --gradient-vector-green: linear-gradient(to right, #08c380 0%, #fd7c0f 31.73%, #ff2b2b 62.5%, #9500ff 100%);
 }
 
 @layer base {
@@ -265,6 +299,13 @@
     font-family: "Inter Variable", "Inter", sans-serif;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
+}
+
+/* Linearity display face (AcidGrotesk substitute: Space Grotesk, weight 400). */
+.font-display {
+  font-family: "Space Grotesk Variable", "Space Grotesk", "Inter Variable", sans-serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
 }
 
 ::-webkit-scrollbar {

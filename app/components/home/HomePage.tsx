@@ -205,7 +205,7 @@ function TodayCard() {
               size="sm"
               onClick={save}
               disabled={saveSettings.isPending}
-              className="bg-amber-400 font-semibold text-zinc-950 hover:bg-amber-300"
+              className="rounded-full bg-amber-400 font-semibold text-white hover:bg-amber-300"
             >
               Save
             </Button>
@@ -354,7 +354,7 @@ export default function HomePage() {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
       <header className="mb-6">
-        <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight">
+        <h1 className="font-display flex items-center gap-2 text-3xl font-normal tracking-tight">
           <img src="/podium-icon.svg" alt="Podium logo" className="size-8" />
           Podium
         </h1>

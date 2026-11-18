@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://podium-82hb.onrender.com/sitemap.xml

@@ -22,6 +22,7 @@ import {
 import type { LinksFunction } from "react-router";
 
 import { Layout as AppLayout } from "@/components/layout/Layout";
+import { CookieConsent } from "@/components/podium/CookieConsent";
 import { AppToolkitProvider } from "@/components/ui/toolkit-provider";
 import { useNavigationState } from "@/hooks/use-navigation-state";
 import { APP_TITLE } from "@/lib/app-config";
@@ -78,6 +79,39 @@ export function Layout({ children }: { children: React.ReactNode }) {
           content="black-translucent"
         />
         <meta name="apple-mobile-web-app-title" content={APP_TITLE} />
+        <title>Podium — Turn any hackathon page into a live mission board</title>
+        <meta
+          name="description"
+          content="Podium turns any hackathon page into a live mission board, then coaches you toward a winning entry: requirements, rubric scores, deadlines and a submission draft, all in one place."
+        />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="Podium" />
+        <meta
+          property="og:title"
+          content="Podium — Turn any hackathon page into a live mission board"
+        />
+        <meta
+          property="og:description"
+          content="Turn any hackathon page into a live mission board, and get coached toward a winning entry."
+        />
+        <meta
+          property="og:image"
+          content="https://podium-82hb.onrender.com/board.png"
+        />
+        <meta property="og:url" content="https://podium-82hb.onrender.com/" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta
+          name="twitter:title"
+          content="Podium — Turn any hackathon page into a live mission board"
+        />
+        <meta
+          name="twitter:description"
+          content="Turn any hackathon page into a live mission board, and get coached toward a winning entry."
+        />
+        <meta
+          name="twitter:image"
+          content="https://podium-82hb.onrender.com/board.png"
+        />
         <link rel="icon" type="image/svg+xml" href={appPath("/favicon.svg")} />
         <link rel="apple-touch-icon" href={appPath("/icon-180.svg")} />
         <Meta />
@@ -191,7 +225,11 @@ export default function Root() {
   // signs the visitor in as the shared demo account on mount, so the gate
   // must not redirect before that login runs. (The server allows both via
   // workspaceAppPublicPaths in server/plugins/auth.ts.)
-  const isPublicPath = pathname === "/" || pathname === "/guest";
+  const isPublicPath =
+    pathname === "/" ||
+    pathname === "/guest" ||
+    pathname === "/privacy" ||
+    pathname === "/terms";
   return (
     <AppToolkitProvider>
       <AppProviders
@@ -203,6 +241,7 @@ export default function Root() {
       >
         <DbSyncSetup />
         <AppContent />
+        <CookieConsent />
       </AppProviders>
     </AppToolkitProvider>
   );

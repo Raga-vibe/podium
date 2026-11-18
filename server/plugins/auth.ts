@@ -16,7 +16,7 @@ import {
 const DEMO_BANNER_SCRIPT = `<script>(function(){if(document.getElementById("podium-demo-pill"))return;var b=document.createElement("div");b.id="podium-demo-pill";b.style.cssText="display:flex;justify-content:center;padding:20px 16px 0;position:relative;z-index:10;";var a=document.createElement("a");a.href="/guest";a.textContent="Try the demo \\u2014 no account needed";a.style.cssText="display:inline-flex;align-items:center;gap:8px;background:#fbbf24;color:#09090b;font-weight:600;padding:10px 20px;border-radius:9999px;text-decoration:none;font-family:inherit;font-size:14px;";b.appendChild(a);document.body.prepend(b);})();</script>`;
 
 export default createToolkitAuthPlugin({
-  workspaceAppPublicPaths: ["/", "/guest"],
+  workspaceAppPublicPaths: ["/", "/guest", "/privacy", "/terms"],
   // The landing page lives at "/": with rootAuth on, the framework's server
   // auth guard serves the sign-in page at "/" before React Router ever runs,
   // so no client-side change can make the landing page visible. Off means

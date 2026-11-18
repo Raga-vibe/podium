@@ -3,13 +3,12 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 
 /**
- * Demo account for judges. It holds only demo boards, so the password lives
- * here in the client: anyone who opens the demo signs in as this account.
- * Every guest entry resets the Builder.io board and clears the Hermes board,
- * so each judge starts from fresh boards.
+ * Demo account for judges. It holds only demo boards. The demo password
+ * never reaches the browser: this page posts to the server route
+ * /api/guest-signin, which signs in the demo account server-side and
+ * redirects here to /home. Every guest entry resets the Builder.io board
+ * and clears the Hermes board, so each judge starts from fresh boards.
  */
-const DEMO_EMAIL = "guest@podium.app";
-const DEMO_PASSWORD = "KCc7Egah9yb#NCD2";
 
 /** The Hermes announcement URL, matching server/db/seed.ts. */
 const HERMES_HACKATHON_URL =
@@ -36,13 +35,15 @@ export default function Guest() {
     startedRef.current = true;
     (async () => {
       try {
-        const res = await fetch("/_agent-native/auth/login", {
+        // Server-side demo sign-in: the password never reaches the browser.
+        // The route signs in the demo account and redirects to /home (or
+        // to /sign-in?demo=failed when the sign-in fails). Fetch follows
+        // the redirect, so check where it landed.
+        const res = await fetch("/api/guest-signin", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           credentials: "include",
-          body: JSON.stringify({ email: DEMO_EMAIL, password: DEMO_PASSWORD }),
         });
-        if (!res.ok) {
+        if (!res.ok || !res.url.endsWith("/home")) {
           throw new Error("Demo sign-in failed. Please sign in instead.");
         }
         setStatus("Resetting the demo boards…");

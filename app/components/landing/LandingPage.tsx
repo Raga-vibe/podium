@@ -340,6 +340,14 @@ export default function LandingPage() {
             <a href={LIVE_URL} className="underline underline-offset-2 hover:text-foreground">
               Live app
             </a>
+            {" · "}
+            <Link to="/privacy" className="underline underline-offset-2 hover:text-foreground">
+              Privacy
+            </Link>
+            {" · "}
+            <Link to="/terms" className="underline underline-offset-2 hover:text-foreground">
+              Terms
+            </Link>
           </p>
         </div>
       </footer>

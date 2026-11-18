@@ -2,6 +2,16 @@ import {
   createToolkitAuthPlugin,
   renderAuthPage,
 } from "@agent-native/toolkit/app/auth/server";
+import { registerAuthPublicPaths } from "@agent-native/core/server";
+
+/**
+ * The demo sign-in route mints a session for the shared demo account, so it
+ * must be reachable without a browser session. It is a framework route with
+ * its own authentication (it mints the session server-side), so it is
+ * registered here as an exact public path for the auth guard. Without this,
+ * the guard 401s the POST before the route handler ever runs.
+ */
+registerAuthPublicPaths(["/api/guest-signin"]);
 
 /**
  * "Try the demo" pill for the top of the sign-in page, linking to the guest

@@ -53,14 +53,14 @@ export function CookieConsent() {
           <button
             type="button"
             onClick={() => choose("declined")}
-            className="h-9 rounded-full border border-border px-4 font-medium hover:bg-white/5"
+            className="h-10 rounded-full border border-border px-4 font-medium hover:bg-white/5"
           >
             Decline
           </button>
           <button
             type="button"
             onClick={() => choose("accepted")}
-            className="h-9 rounded-full bg-[#ff4800] px-4 font-semibold text-white hover:bg-[#ff5e23]"
+            className="h-10 rounded-full bg-signal-orange px-4 font-medium text-white hover:bg-ember"
           >
             Accept
           </button>

@@ -15,6 +15,7 @@ import { toast } from "sonner";
 
 import { Countdown } from "@/components/podium/Countdown";
 import { DraftPanel } from "@/components/podium/DraftPanel";
+import { ImportBar } from "@/components/podium/ImportBar";
 import { MissionBoard } from "@/components/podium/MissionBoard";
 import { ProjectDrawer } from "@/components/podium/ProjectDrawer";
 import { RubricPanel } from "@/components/podium/RubricPanel";
@@ -101,14 +102,14 @@ export default function HackathonRoute() {
 
   if (query.isPending) {
     return (
-      <div className="mx-auto w-full max-w-6xl space-y-4 px-4 py-8 sm:px-6">
-        <Skeleton className="h-10 w-2/3" />
-        <Skeleton className="h-6 w-1/2" />
-        <div className="grid gap-4 lg:grid-cols-3">
-          <Skeleton className="h-96 lg:col-span-2" />
+      <div className="mx-auto w-full max-w-7xl space-y-4 px-6 py-8">
+        <Skeleton className="h-10 w-2/3 rounded-2xl" />
+        <Skeleton className="h-6 w-1/2 rounded-2xl" />
+        <div className="grid gap-6 lg:grid-cols-3">
+          <Skeleton className="h-96 rounded-2xl lg:col-span-2" />
           <div className="space-y-4">
-            <Skeleton className="h-64" />
-            <Skeleton className="h-48" />
+            <Skeleton className="h-64 rounded-2xl" />
+            <Skeleton className="h-48 rounded-2xl" />
           </div>
         </div>
       </div>
@@ -117,8 +118,8 @@ export default function HackathonRoute() {
 
   if (query.isError || !query.data) {
     return (
-      <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
-        <Card>
+      <div className="mx-auto w-full max-w-7xl px-6 py-8">
+        <Card className="rounded-2xl shadow-none">
           <CardContent className="py-10 text-center">
             <p role="alert" className="text-sm">
               Could not load this hackathon.{" "}
@@ -147,10 +148,13 @@ export default function HackathonRoute() {
   );
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
+    <div className="mx-auto w-full max-w-7xl px-6 py-8">
+      <div className="mb-6">
+        <ImportBar />
+      </div>
       <Link
         to="/home"
-        className="inline-flex items-center gap-1 text-sm text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-amber-400 rounded"
+        className="inline-flex items-center gap-1 rounded text-sm text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-signal-orange focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         <IconArrowLeft className="size-4" aria-hidden /> All hackathons
       </Link>
@@ -158,7 +162,7 @@ export default function HackathonRoute() {
       <header className="mt-3 mb-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
-            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            <h1 className="font-display text-4xl leading-[1.1] font-normal tracking-[-0.02em]">
               {hackathon.name}
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
@@ -173,18 +177,23 @@ export default function HackathonRoute() {
               </a>
               {hackathon.prizeSummary ? ` · ${hackathon.prizeSummary}` : ""}
             </p>
-            <p className="mt-2 text-sm">
-              <Countdown
-                deadline={hackathon.submissionDeadline}
-                className="font-semibold text-amber-300"
-              />{" "}
-              <span className="text-muted-foreground">
-                · due {formatLocal(hackathon.submissionDeadline)}
+            <div className="mt-4">
+              <p className="text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
+                Submissions close in
+              </p>
+              <p className="mt-1">
+                <Countdown
+                  deadline={hackathon.submissionDeadline}
+                  className="font-display text-3xl text-signal-orange"
+                />
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                due {formatLocal(hackathon.submissionDeadline)}
                 {organizerTime ? ` · ${organizerTime}` : ""}
-              </span>
-            </p>
+              </p>
+            </div>
           </div>
-          <Button variant="outline" onClick={() => setProjectOpen(true)}>
+          <Button variant="outline" className="h-10 rounded-full px-4" onClick={() => setProjectOpen(true)}>
             <IconFolder className="size-4" aria-hidden />
             {data.project ? data.project.name : "Add your project"}
           </Button>
@@ -194,6 +203,7 @@ export default function HackathonRoute() {
           <Button
             size="sm"
             variant="outline"
+            className="h-10 rounded-full px-4"
             onClick={() =>
               askAgent(
                 `What's left for the hackathon "${hackathon.name}"? Use the whats-left action and tell me the open requirements in order, with the time left.`,
@@ -206,6 +216,7 @@ export default function HackathonRoute() {
           <Button
             size="sm"
             variant="outline"
+            className="h-10 rounded-full px-4"
             onClick={() =>
               askAgent(
                 `Am I ready to submit the hackathon "${hackathon.name}"? Use the submission-readiness skill and the check-readiness action, then tell me pass or the fix list.`,
@@ -218,6 +229,7 @@ export default function HackathonRoute() {
           <Button
             size="sm"
             variant="outline"
+            className="h-10 rounded-full px-4"
             disabled={!weakest}
             onClick={() =>
               weakest &&
@@ -232,6 +244,7 @@ export default function HackathonRoute() {
           <Button
             size="sm"
             variant="outline"
+            className="h-10 rounded-full px-4"
             onClick={() =>
               askAgent(
                 `Draft my submission for the hackathon "${hackathon.name}" using the submission-writer skill. Write the submission description plus the "built during the event" disclosure from the board and project, then save the draft.`,
@@ -291,10 +304,10 @@ export default function HackathonRoute() {
         ) : null}
       </header>
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
+      <div className="grid gap-6 lg:grid-cols-3">
+        <Card className="rounded-2xl shadow-none lg:col-span-2">
           <CardHeader>
-            <CardTitle>Mission board</CardTitle>
+            <CardTitle className="text-xl font-medium">Mission board</CardTitle>
           </CardHeader>
           <CardContent>
             <MissionBoard
@@ -306,10 +319,10 @@ export default function HackathonRoute() {
           </CardContent>
         </Card>
 
-        <div className="space-y-4">
-          <Card>
+        <div className="space-y-6">
+          <Card className="rounded-2xl shadow-none">
             <CardHeader>
-              <CardTitle>Rubric</CardTitle>
+              <CardTitle className="text-xl font-medium">Rubric</CardTitle>
             </CardHeader>
             <CardContent>
               <RubricPanel
@@ -324,9 +337,9 @@ export default function HackathonRoute() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="rounded-2xl shadow-none">
             <CardHeader>
-              <CardTitle>Timeline</CardTitle>
+              <CardTitle className="text-xl font-medium">Timeline</CardTitle>
             </CardHeader>
             <CardContent>
               <TimelinePanel
@@ -340,15 +353,20 @@ export default function HackathonRoute() {
         </div>
       </div>
 
-      <Card className="mt-4">
+      <Card className="mt-6 rounded-2xl shadow-none">
         <CardHeader>
-          <CardTitle>Submission draft</CardTitle>
+          <CardTitle className="text-xl font-medium">Submission draft</CardTitle>
         </CardHeader>
         <CardContent>
           <DraftPanel
             hackathonId={hackathonId}
             hackathonName={hackathon.name}
             initialBody={data.draft?.body ?? null}
+            links={{
+              repoUrl: data.project?.repoUrl ?? null,
+              demoUrl: data.project?.demoUrl ?? null,
+              liveUrl: data.project?.liveUrl ?? null,
+            }}
           />
         </CardContent>
       </Card>

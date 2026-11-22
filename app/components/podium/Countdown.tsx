@@ -43,10 +43,10 @@ export function ProgressRing({
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={circumference * (1 - clamped)}
-          className="stroke-amber-400 transition-all duration-500"
+          className="stroke-signal-orange transition-all duration-150"
         />
       </svg>
-      <span className="absolute inset-0 flex items-center justify-center text-xs font-semibold">
+      <span className="absolute inset-0 flex items-center justify-center text-xs font-medium">
         {Math.round(clamped * 100)}%
       </span>
     </div>

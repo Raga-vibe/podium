@@ -74,12 +74,12 @@ export function ImportBar() {
             setTimedOut(false);
           }}
           aria-label="Hackathon page URL"
-          className="h-11 flex-1 bg-card"
+          className="h-11 flex-1 rounded-lg bg-card"
         />
         <Button
           type="submit"
           disabled={sent && !timedOut}
-          className="h-11 rounded-full bg-[#ff4800] px-5 font-semibold text-white hover:bg-[#ff5e23] disabled:opacity-60"
+          className="h-11 rounded-full bg-signal-orange px-5 font-medium text-white hover:bg-ember disabled:opacity-60"
         >
           {sent && !timedOut ? "Import sent…" : "Import hackathon"}
         </Button>

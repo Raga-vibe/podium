@@ -108,11 +108,11 @@ function RequirementRow({
       onDragLeave={() => setDragging(false)}
       onDrop={onDrop}
       onClick={onSelect}
-      className={`flex items-start gap-2 rounded-lg border p-3 transition-colors ${
+      className={`flex items-start gap-3 rounded-xl border p-4 transition-colors duration-150 ${
         selected
-          ? "border-amber-400/70 bg-amber-400/5"
-          : "border-border bg-card"
-      } ${dragging ? "border-dashed border-amber-400" : ""}`}
+          ? "border-signal-orange/70 bg-signal-orange/5"
+          : "border-border bg-card hover:border-white/20"
+      } ${dragging ? "border-dashed border-signal-orange" : ""}`}
     >
       <span
         className="mt-0.5 cursor-grab text-muted-foreground"
@@ -133,7 +133,7 @@ function RequirementRow({
         }
         onClick={(event) => event.stopPropagation()}
         aria-label={`Mark "${requirement.title}" as ${requirement.done ? "not done" : "done"}`}
-        className="mt-0.5 size-5 shrink-0 accent-amber-400 disabled:opacity-50"
+        className="mt-0.5 size-5 shrink-0 accent-signal-orange disabled:opacity-50"
       />
       <div className="min-w-0 flex-1">
         {editing ? (
@@ -161,7 +161,7 @@ function RequirementRow({
               onSelect();
               setEditing(true);
             }}
-            className={`block w-full text-left text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded ${
+            className={`block w-full text-left text-base font-medium outline-none focus-visible:ring-2 focus-visible:ring-signal-orange focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded ${
               requirement.done ? "text-muted-foreground line-through" : ""
             }`}
             title="Click to edit"
@@ -174,12 +174,12 @@ function RequirementRow({
         ) : null}
         <p className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
           {requirement.source === "agent" ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/15 px-2 py-0.5 font-medium text-amber-300">
+            <span className="inline-flex items-center gap-1 rounded-full bg-signal-orange/15 px-2 py-0.5 font-medium text-ember">
               <IconRobot className="size-3" aria-hidden /> agent
             </span>
           ) : null}
           {requirement.state === "proposed" ? (
-            <span className="inline-flex items-center rounded-full bg-sky-400/15 px-2 py-0.5 font-medium text-sky-300">
+            <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 font-medium text-muted-foreground">
               Needs review
             </span>
           ) : null}
@@ -316,7 +316,7 @@ export function MissionBoard({
         if (items.length === 0) return null;
         return (
           <section key={categoryKey} aria-label={`${CATEGORY_LABELS[categoryKey]} requirements`}>
-            <h3 className="mb-2 text-sm font-semibold tracking-wide text-muted-foreground uppercase">
+            <h3 className="mb-2 text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
               {CATEGORY_LABELS[categoryKey]} · {items.filter((i) => i.done).length}/{items.length}
             </h3>
             <ul className="space-y-2">
@@ -347,7 +347,7 @@ export function MissionBoard({
         );
       })}
       {requirements.length === 0 ? (
-        <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
+        <p className="rounded-2xl border border-dashed p-6 text-center text-sm text-muted-foreground">
           No requirements yet. Import a hackathon page or add the first one below.
         </p>
       ) : null}
@@ -357,13 +357,13 @@ export function MissionBoard({
           onChange={(event) => setTitle(event.target.value)}
           placeholder="Add a requirement, e.g. Ship a demo video"
           aria-label="New requirement title"
-          className="h-10 flex-1 bg-card"
+          className="h-11 flex-1 rounded-lg bg-card"
         />
         <select
           value={category}
           onChange={(event) => setCategory(event.target.value as RequirementCategory)}
           aria-label="Requirement category"
-          className="h-10 rounded-md border border-input bg-card px-3 text-sm"
+          className="h-11 rounded-lg border border-input bg-card px-3 text-sm"
         >
           {REQUIREMENT_CATEGORIES.map((key) => (
             <option key={key} value={key}>
@@ -374,7 +374,7 @@ export function MissionBoard({
         <Button
           type="submit"
           disabled={add.isPending || title.trim().length === 0}
-          className="h-10 rounded-full bg-amber-400 font-semibold text-white hover:bg-amber-300"
+          className="h-11 rounded-full bg-signal-orange px-5 font-medium text-white hover:bg-ember"
         >
           <IconPlus className="size-4" aria-hidden /> Add
         </Button>

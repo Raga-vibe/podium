@@ -78,7 +78,7 @@ export function ProjectDrawer({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-md">
         <SheetHeader>
-          <SheetTitle>Your project</SheetTitle>
+          <SheetTitle className="font-medium">Your project</SheetTitle>
           <SheetDescription>
             What are you building for {hackathonName}? The rubric coach scores
             this, and the submission writer drafts from it.
@@ -93,6 +93,7 @@ export function ProjectDrawer({
               onChange={(event) => setName(event.target.value)}
               placeholder="Podium"
               autoComplete="off"
+              className="h-11 rounded-lg"
             />
           </div>
           <div className="space-y-1.5">
@@ -103,7 +104,7 @@ export function ProjectDrawer({
               onChange={(event) => setPitch(event.target.value)}
               placeholder="One or two sentences: what it does and why it wins."
               rows={3}
-              className="w-full rounded-md border border-input bg-card px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+              className="w-full rounded-lg border border-input bg-card px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-signal-orange focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             />
           </div>
           <div className="space-y-1.5">
@@ -116,6 +117,7 @@ export function ProjectDrawer({
               onChange={(event) => setRepoUrl(event.target.value)}
               placeholder="https://github.com/you/project"
               autoComplete="off"
+              className="h-11 rounded-lg"
             />
           </div>
           <div className="space-y-1.5">
@@ -128,6 +130,7 @@ export function ProjectDrawer({
               onChange={(event) => setDemoUrl(event.target.value)}
               placeholder="https://your-demo-clip-link"
               autoComplete="off"
+              className="h-11 rounded-lg"
             />
           </div>
           <div className="space-y-1.5">
@@ -140,12 +143,13 @@ export function ProjectDrawer({
               onChange={(event) => setLiveUrl(event.target.value)}
               placeholder="https://your-deployed-app"
               autoComplete="off"
+              className="h-11 rounded-lg"
             />
           </div>
           <Button
             type="submit"
             disabled={save.isPending}
-            className="w-full rounded-full bg-amber-400 font-semibold text-white hover:bg-amber-300"
+            className="h-11 w-full rounded-full bg-signal-orange font-medium text-white hover:bg-ember"
           >
             {save.isPending ? "Saving…" : "Save project"}
           </Button>

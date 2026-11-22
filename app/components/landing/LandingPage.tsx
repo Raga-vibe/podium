@@ -21,14 +21,14 @@ function MockBoard() {
     <div className="space-y-3 p-4 sm:p-5">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="truncate text-sm font-semibold">
+          <p className="truncate text-sm font-medium">
             Builder.io Agent-Native Hackathon
           </p>
           <p className="text-xs text-muted-foreground">
             Mission board · rubric · timeline
           </p>
         </div>
-        <span className="rounded-full bg-amber-400/15 px-2.5 py-1 text-xs font-medium text-amber-300">
+        <span className="rounded-full bg-signal-orange/15 px-2.5 py-1 text-xs font-medium text-ember">
           Live board
         </span>
       </div>
@@ -40,12 +40,12 @@ function MockBoard() {
         ].map((item) => (
           <li
             key={item.title}
-            className="flex items-center gap-2.5 rounded-lg border border-border bg-background px-3 py-2.5 text-sm"
+            className="flex items-center gap-2.5 rounded-xl border border-border bg-background px-3 py-2.5 text-sm"
           >
             <span
               className={`flex size-5 shrink-0 items-center justify-center rounded-full border ${
                 item.done
-                  ? "border-amber-400 bg-amber-400 text-white"
+                  ? "border-signal-orange bg-signal-orange text-white"
                   : "border-muted-foreground/40"
               }`}
             >
@@ -59,7 +59,7 @@ function MockBoard() {
               {item.title}
             </span>
             {item.agent ? (
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-amber-400/15 px-2 py-0.5 text-xs font-medium text-amber-300">
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-signal-orange/15 px-2 py-0.5 text-xs font-medium text-ember">
                 <IconRobot className="size-3" aria-hidden /> agent
               </span>
             ) : null}
@@ -103,11 +103,11 @@ function useImageReady(src: string) {
 function BoardPreview() {
   const ready = useImageReady("/board.png");
   return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-card text-left shadow-2xl shadow-black/40">
+    <div className="overflow-hidden rounded-2xl border border-border bg-card text-left shadow-none">
       <div className="flex items-center gap-2 border-b border-border px-4 py-3">
-        <span className="size-2.5 rounded-full bg-red-400/70" />
-        <span className="size-2.5 rounded-full bg-amber-400/70" />
-        <span className="size-2.5 rounded-full bg-emerald-400/70" />
+        <span className="size-2.5 rounded-full bg-white/25" />
+        <span className="size-2.5 rounded-full bg-white/15" />
+        <span className="size-2.5 rounded-full bg-white/10" />
         <span className="ml-2 min-w-0 truncate rounded-md bg-muted px-3 py-1 text-xs text-muted-foreground">
           podium-82hb.onrender.com
         </span>
@@ -132,7 +132,7 @@ function HomeShot() {
   const ready = useImageReady("/home.png");
   if (!ready) return null;
   return (
-    <figure className="mt-8 overflow-hidden rounded-2xl border border-border bg-card shadow-xl shadow-black/30">
+    <figure className="mt-8 overflow-hidden rounded-2xl border border-border bg-card shadow-none">
       <img
         src="/home.png"
         alt="Podium home page listing hackathons with progress bars, deadlines and the morning brief"
@@ -208,8 +208,8 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-40 border-b border-border/60 bg-background/90 backdrop-blur">
-        <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6">
-          <Link to="/" className="flex shrink-0 items-center gap-2 font-bold tracking-tight">
+        <div className="mx-auto flex h-14 w-full max-w-7xl items-center justify-between gap-2 px-6 sm:gap-4">
+          <Link to="/" className="flex shrink-0 items-center gap-2 font-medium tracking-tight">
             <img src="/podium-icon.svg" alt="Podium logo" className="size-6" />
             Podium
           </Link>
@@ -225,7 +225,7 @@ export default function LandingPage() {
             <Button variant="ghost" size="sm" asChild>
               <Link to="/home">Sign in</Link>
             </Button>
-            <Button size="sm" asChild className="rounded-full bg-amber-400 font-semibold text-white hover:bg-amber-300">
+            <Button size="sm" asChild className="rounded-full bg-signal-orange font-medium text-white hover:bg-ember">
               <Link to="/home">
                 Get started <IconArrowRight className="size-4" aria-hidden />
               </Link>
@@ -235,23 +235,23 @@ export default function LandingPage() {
       </header>
 
       <main>
-        <section className="mx-auto w-full max-w-6xl px-4 pt-14 pb-10 sm:px-6 sm:pt-20">
+        <section className="mx-auto w-full max-w-7xl px-6 pt-16 pb-16 sm:pt-24">
           <div className="grid items-center gap-10 lg:grid-cols-2">
             <div>
-              <p className="inline-flex max-w-full items-center gap-2 rounded-full border border-amber-400/30 bg-amber-400/10 px-3 py-1 text-xs font-medium text-amber-300">
+              <p className="inline-flex max-w-full items-center gap-2 rounded-full border border-signal-orange/30 bg-signal-orange/10 px-3 py-1 text-xs font-medium text-ember">
                 <IconSparkles className="size-3.5 shrink-0" aria-hidden />
                 Builder.io Agent-Native Hackathon
               </p>
-              <h1 className="font-display mt-5 text-4xl leading-tight font-normal tracking-tight sm:text-5xl lg:text-6xl">
+              <h1 className="font-display mt-5 text-5xl leading-[1.05] font-normal tracking-[-0.02em] sm:text-[56px]">
                 Turn any hackathon page into a live mission board.
               </h1>
-              <p className="mt-4 max-w-xl text-lg text-muted-foreground">
+              <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
                 Paste a hackathon URL and Podium&apos;s agent reads the rules,
                 deadlines, requirements and rubric into a board you share. Get
                 coached toward a winning entry, then draft the submission.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <Button size="lg" asChild className="rounded-full bg-amber-400 font-semibold text-white hover:bg-amber-300">
+                <Button size="lg" asChild className="h-11 rounded-full bg-signal-orange px-5 font-medium text-white hover:bg-ember">
                   <Link to="/home">
                     Get started <IconArrowRight className="size-4" aria-hidden />
                   </Link>
@@ -276,13 +276,13 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="how-it-works" className="mx-auto w-full max-w-6xl scroll-mt-20 px-4 py-10 sm:px-6">
-          <h2 className="font-display text-2xl font-normal tracking-tight sm:text-3xl">How it works</h2>
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
+        <section id="how-it-works" className="mx-auto w-full max-w-7xl scroll-mt-20 px-6 py-16">
+          <h2 className="text-2xl font-medium tracking-tight">How it works</h2>
+          <div className="mt-6 grid gap-6 md:grid-cols-3">
             {STEPS.map((step) => (
-              <article key={step.n} className="rounded-xl border border-border bg-card p-5">
-                <p className="text-sm font-bold text-amber-400">{step.n}</p>
-                <h3 className="mt-2 font-semibold">{step.title}</h3>
+              <article key={step.n} className="rounded-2xl border border-border bg-card p-6">
+                <p className="font-display text-sm text-signal-orange">{step.n}</p>
+                <h3 className="mt-2 font-medium">{step.title}</h3>
                 <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{step.body}</p>
               </article>
             ))}
@@ -290,23 +290,23 @@ export default function LandingPage() {
           <HomeShot />
         </section>
 
-        <section id="features" className="mx-auto w-full max-w-6xl scroll-mt-20 px-4 py-10 sm:px-6">
-          <h2 className="font-display text-2xl font-normal tracking-tight sm:text-3xl">Everything you need to ship</h2>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <section id="features" className="mx-auto w-full max-w-7xl scroll-mt-20 px-6 py-16">
+          <h2 className="text-2xl font-medium tracking-tight">Everything you need to ship</h2>
+          <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map((feature) => (
-              <article key={feature.title} className="rounded-xl border border-border bg-card p-5">
-                <h3 className="font-semibold">{feature.title}</h3>
+              <article key={feature.title} className="rounded-2xl border border-border bg-card p-6">
+                <h3 className="font-medium">{feature.title}</h3>
                 <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{feature.body}</p>
               </article>
             ))}
           </div>
         </section>
 
-        <section className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
-          <div className="flex flex-col items-start justify-between gap-6 rounded-2xl border border-amber-400/30 bg-amber-400/5 p-6 sm:p-8 lg:flex-row lg:items-center">
+        <section className="mx-auto w-full max-w-7xl px-6 py-16">
+          <div className="flex flex-col items-start justify-between gap-6 rounded-2xl border border-signal-orange/30 bg-signal-orange/5 p-6 sm:p-8 lg:flex-row lg:items-center">
             <div>
-              <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
-                <IconCalendar className="size-6 shrink-0 text-amber-400" aria-hidden />
+              <h2 className="flex items-center gap-2 text-2xl font-medium tracking-tight">
+                <IconCalendar className="size-6 shrink-0 text-signal-orange" aria-hidden />
                 Your next deadline is closer than you think.
               </h2>
               <p className="mt-2 max-w-xl text-muted-foreground">
@@ -317,7 +317,7 @@ export default function LandingPage() {
                 , and it works for yours too.
               </p>
             </div>
-            <Button size="lg" asChild className="shrink-0 rounded-full bg-amber-400 font-semibold text-white hover:bg-amber-300">
+            <Button size="lg" asChild className="h-11 shrink-0 rounded-full bg-signal-orange px-5 font-medium text-white hover:bg-ember">
               <Link to="/home">
                 Get started <IconArrowRight className="size-4" aria-hidden />
               </Link>
@@ -327,7 +327,7 @@ export default function LandingPage() {
       </main>
 
       <footer className="border-t border-border/60">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-4 py-6 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-2 px-6 py-6 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <p className="flex items-center gap-2">
             <img src="/podium-icon.svg" alt="Podium logo" className="size-5" />
             Podium · Built during the Builder.io Agent-Native Hackathon, Nov 2026.

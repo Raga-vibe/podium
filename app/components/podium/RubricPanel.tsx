@@ -66,27 +66,27 @@ function CriterionCard({
   return (
     <li
       onClick={onSelect}
-      className={`rounded-lg border p-3 ${
-        selected ? "border-amber-400/70 bg-amber-400/5" : "border-border bg-card"
-      } ${weakest ? "ring-1 ring-amber-400/40" : ""}`}
+      className={`rounded-2xl border p-5 ${
+        selected ? "border-signal-orange/70 bg-signal-orange/5" : "border-border bg-card"
+      } ${weakest ? "ring-1 ring-signal-orange/40" : ""}`}
     >
       <div className="flex items-baseline justify-between gap-2">
         <p className="text-sm font-medium">
           {criterion.name}
           {weakest ? (
-            <span className="ml-2 rounded-full bg-amber-400/15 px-2 py-0.5 text-xs font-semibold text-amber-300">
+            <span className="ml-2 rounded-full bg-signal-orange/15 px-2 py-0.5 text-xs font-medium text-ember">
               Weakest
             </span>
           ) : null}
           {score?.state === "disputed" ? (
-            <span className="ml-2 rounded-full bg-sky-400/15 px-2 py-0.5 text-xs font-semibold text-sky-300">
+            <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
               Disputed — awaiting rescore
             </span>
           ) : null}
         </p>
         <p className="shrink-0 text-sm text-muted-foreground">
           {score ? (
-            <span className="font-semibold text-foreground">{score.score} / 10</span>
+            <span className="font-display text-base text-foreground">{score.score} / 10</span>
           ) : (
             "Not scored"
           )}{" "}
@@ -102,7 +102,7 @@ function CriterionCard({
         aria-label={`${criterion.name} score`}
       >
         <div
-          className="h-full rounded-full bg-amber-400 transition-all duration-500"
+          className="h-full rounded-full bg-signal-orange transition-all duration-150"
           style={{ width: `${score ? score.score * 10 : 0}%` }}
         />
       </div>
@@ -114,7 +114,7 @@ function CriterionCard({
       ) : null}
       {score?.topFix ? (
         <p className="mt-1 text-sm">
-          <span className="font-medium text-amber-300">Top fix: </span>
+          <span className="font-medium text-ember">Top fix: </span>
           {score.topFix}
         </p>
       ) : null}
@@ -143,7 +143,7 @@ function CriterionCard({
               <Button
                 type="submit"
                 size="sm"
-                className="h-8 rounded-full bg-amber-400 font-semibold text-white hover:bg-amber-300"
+                className="h-8 rounded-full bg-signal-orange px-4 font-medium text-white hover:bg-ember"
                 disabled={addNote.isPending || note.trim().length === 0}
               >
                 Rescore
@@ -233,7 +233,7 @@ export function RubricPanel({
           ) : (
             <>
               Weighted total{" "}
-              <span className="text-base font-bold text-foreground">
+              <span className="font-display text-xl text-foreground">
                 {weightedTotal.toFixed(1)} / 10
               </span>
             </>
@@ -241,7 +241,7 @@ export function RubricPanel({
         </p>
         <Button
           size="sm"
-          className="rounded-full bg-amber-400 font-semibold text-white hover:bg-amber-300"
+          className="h-11 rounded-full bg-signal-orange px-5 font-medium text-white hover:bg-ember"
           onClick={() =>
             askAgent(
               `Score my project for the hackathon "${hackathonName}" using the rubric-coach skill. Score every criterion honestly against the project and rubric, then save the scores.`,
@@ -253,7 +253,7 @@ export function RubricPanel({
         </Button>
       </div>
       {criteria.length === 0 ? (
-        <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
+        <p className="rounded-2xl border border-dashed p-6 text-center text-sm text-muted-foreground">
           No rubric yet. Import the hackathon page and the agent will extract
           the judging criteria.
         </p>
@@ -289,6 +289,7 @@ export function RubricPanel({
           <Button
             variant="outline"
             size="sm"
+            className="h-10 rounded-full px-4"
             onClick={() =>
               askAgent(
                 `Fix my weakest criterion for the hackathon "${hackathonName}": "${weakest.criterion.name}" is at ${weakest.score.score}/10. Top fix: ${weakest.score.topFix ?? "not given"}. Tell me the single most impactful change and update the board.`,

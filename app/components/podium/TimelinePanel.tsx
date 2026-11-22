@@ -53,7 +53,7 @@ export function TimelinePanel({
       <ol className="space-y-3">
         {milestones.map((milestone) => (
           <li key={milestone.id} className="flex items-start gap-3 text-sm">
-            <IconFlag className="mt-0.5 size-4 shrink-0 text-amber-400" aria-hidden />
+            <IconFlag className="mt-0.5 size-4 shrink-0 text-signal-orange" aria-hidden />
             <span>
               <span className="font-medium">{milestone.label}</span>
               <br />
@@ -62,10 +62,10 @@ export function TimelinePanel({
           </li>
         ))}
         {deadline ? (
-          <li className="flex items-start gap-3 rounded-lg border border-amber-400/40 bg-amber-400/5 p-3 text-sm">
-            <IconFlag className="mt-0.5 size-4 shrink-0 text-amber-400" aria-hidden />
+          <li className="flex items-start gap-3 rounded-xl border border-signal-orange/40 bg-signal-orange/5 p-4 text-sm">
+            <IconFlag className="mt-0.5 size-4 shrink-0 text-signal-orange" aria-hidden />
             <span>
-              <span className="font-semibold">Submissions close</span>
+              <span className="font-medium">Submissions close</span>
               <br />
               <span className="text-muted-foreground">
                 {deadlineLabel}
@@ -77,7 +77,7 @@ export function TimelinePanel({
                 ) : null}
               </span>
               <br />
-              <Countdown deadline={deadline} className="font-medium text-amber-300" />
+              <Countdown deadline={deadline} className="font-display text-lg text-signal-orange" />
             </span>
           </li>
         ) : (
@@ -89,7 +89,7 @@ export function TimelinePanel({
       <Button
         variant="outline"
         size="sm"
-        className="mt-4"
+        className="mt-4 h-10 rounded-full px-4"
         onClick={() => void downloadCalendar()}
         disabled={downloading}
       >

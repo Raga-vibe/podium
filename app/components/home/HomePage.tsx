@@ -46,13 +46,13 @@ function HackathonCard({ hackathon }: { hackathon: HackathonSummary }) {
   return (
     <Link
       to={`/hackathon/${hackathon.id}`}
-      className="group block min-w-0 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+      className="group block min-w-0 rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-signal-orange focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       aria-label={`${hackathon.name}, open mission board`}
     >
-      <Card className="h-full transition-colors group-hover:border-amber-400/60">
+      <Card className="h-full rounded-2xl shadow-none transition-colors duration-150 group-hover:border-signal-orange/60">
         <CardHeader className="flex flex-row items-start justify-between gap-3">
           <div className="min-w-0">
-            <CardTitle className="truncate text-lg leading-snug">
+            <CardTitle className="truncate text-xl font-medium leading-snug">
               {hackathon.name}
             </CardTitle>
             <p className="mt-1 truncate text-sm text-muted-foreground">
@@ -67,7 +67,7 @@ function HackathonCard({ hackathon }: { hackathon: HackathonSummary }) {
         </CardHeader>
         <CardContent className="space-y-2 text-sm">
           <p className="flex items-center gap-2 font-medium">
-            <IconCalendar className="size-4 shrink-0 text-amber-400" aria-hidden />
+            <IconCalendar className="size-4 shrink-0 text-signal-orange" aria-hidden />
             <Countdown deadline={hackathon.submissionDeadline} />
           </p>
           <p className="text-muted-foreground">
@@ -131,10 +131,10 @@ function TodayCard() {
   }
 
   return (
-    <Card>
+    <Card className="rounded-2xl shadow-none">
       <CardHeader className="flex flex-row items-center justify-between gap-3">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <IconSparkles className="size-4 text-amber-400" aria-hidden />
+        <CardTitle className="flex items-center gap-2 text-base font-medium">
+          <IconSparkles className="size-4 text-signal-orange" aria-hidden />
           Today
         </CardTitle>
         {!editing ? (
@@ -165,6 +165,7 @@ function TodayCard() {
           <Button
             variant="outline"
             size="sm"
+            className="h-10 rounded-full px-4"
             onClick={() =>
               askAgent(
                 "Run the daily-brief skill now and save today's brief for my active hackathons.",
@@ -181,13 +182,13 @@ function TodayCard() {
           ) : null}
         </div>
         {editing ? (
-          <div className="flex flex-wrap items-center gap-3 rounded-lg border p-3">
+          <div className="flex flex-wrap items-center gap-3 rounded-2xl border p-3">
             <label className="flex items-center gap-2 text-sm">
               <input
                 type="checkbox"
                 checked={enabled}
                 onChange={(event) => setEnabled(event.target.checked)}
-                className="size-4 accent-amber-400"
+                className="size-4 accent-signal-orange"
               />
               Daily brief on
             </label>
@@ -205,7 +206,7 @@ function TodayCard() {
               size="sm"
               onClick={save}
               disabled={saveSettings.isPending}
-              className="rounded-full bg-amber-400 font-semibold text-white hover:bg-amber-300"
+              className="h-11 rounded-full bg-signal-orange px-5 font-medium text-white hover:bg-ember"
             >
               Save
             </Button>
@@ -264,7 +265,7 @@ function BuilderConnectBanner() {
   if (!shown || !visible) return null;
 
   return (
-    <Card className="mb-6 border-amber-400/60 bg-amber-400/10">
+    <Card className="mb-6 rounded-2xl border-signal-orange/60 bg-signal-orange/10 shadow-none">
       <CardContent className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
           <p className="font-medium">Connect Builder.io to use the agent</p>
@@ -274,7 +275,7 @@ function BuilderConnectBanner() {
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
-          <Button onClick={() => navigate("/settings/model")}>
+          <Button onClick={() => navigate("/settings/model")} className="h-11 rounded-full px-5 font-medium">
             Connect Builder.io
           </Button>
         </div>
@@ -352,13 +353,13 @@ export default function HomePage() {
   const seeding = listEmpty && (seedStarter.isPending || seedStarter.isSuccess);
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
+    <div className="mx-auto w-full max-w-7xl px-6 py-8">
       <header className="mb-6">
-        <h1 className="font-display flex items-center gap-2 text-3xl font-normal tracking-tight">
+        <h1 className="font-display flex items-center gap-2 text-4xl font-normal tracking-[-0.02em]">
           <img src="/podium-icon.svg" alt="Podium logo" className="size-8" />
           Podium
         </h1>
-        <p className="mt-1 max-w-2xl text-muted-foreground">
+        <p className="mt-1 max-w-2xl text-base leading-relaxed text-muted-foreground">
           Turn any hackathon page into a live mission board, and get coached
           toward a winning entry. You stay in control, the agent does the
           thinking.
@@ -373,13 +374,13 @@ export default function HomePage() {
 
       <section aria-label="Hackathons" className="mb-6">
         {hackathonsQuery.isPending ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {[0, 1, 2].map((i) => (
-              <Skeleton key={i} className="h-44 w-full rounded-xl" />
+              <Skeleton key={i} className="h-44 w-full rounded-2xl" />
             ))}
           </div>
         ) : hackathonsQuery.isError ? (
-          <Card>
+          <Card className="rounded-2xl shadow-none">
             <CardContent className="py-8 text-center">
               <p role="alert" className="text-sm">
                 Could not load your hackathons.{" "}
@@ -395,7 +396,7 @@ export default function HomePage() {
             </CardContent>
           </Card>
         ) : seeding ? (
-          <Card>
+          <Card className="rounded-2xl shadow-none">
             <CardContent className="py-10 text-center">
               <p className="font-medium">Setting up your first boards…</p>
               <p className="mt-1 text-sm text-muted-foreground">
@@ -405,7 +406,7 @@ export default function HomePage() {
             </CardContent>
           </Card>
         ) : hackathons.length === 0 ? (
-          <Card>
+          <Card className="rounded-2xl shadow-none">
             <CardContent className="py-10 text-center">
               <p className="font-medium">No hackathons yet</p>
               <p className="mt-1 text-sm text-muted-foreground">
@@ -415,7 +416,7 @@ export default function HomePage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {hackathons.map((hackathon) => (
               <HackathonCard key={hackathon.id} hackathon={hackathon} />
             ))}

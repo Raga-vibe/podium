@@ -11,9 +11,16 @@
   --color-amber-400: #ff4800;
   --color-signal-orange: #ff4800;
   --color-ember: #ff5e23;
+  --color-burnt-orange: #ca4e17;
   --color-void: #000000;
   --color-near-black: #050505;
   --color-carbon: #292929;
+  --color-graphite: #4d4d4d;
+  --color-ash: #666666;
+  --color-steel: #808080;
+  --color-fog: #999999;
+  --color-silver: #bfbfbf;
+  --color-vector-green: #08c380;
   --color-electric-yellow: #ffd900;
   --font-display: "Space Grotesk Variable", "Space Grotesk", "Inter Variable", sans-serif;
 }
@@ -290,6 +297,7 @@
   --color-ember: #ff5e23;
   --color-burnt-orange: #ca4e17;
   --color-electric-yellow: #ffd900;
+  --color-vector-green: #08c380;
   --gradient-vector-green: linear-gradient(to right, #08c380 0%, #fd7c0f 31.73%, #ff2b2b 62.5%, #9500ff 100%);
 }
 
@@ -301,11 +309,21 @@
   }
 }
 
-/* Linearity display face (AcidGrotesk substitute: Space Grotesk, weight 400). */
+/* Linearity display face (AcidGrotesk substitute: Space Grotesk, weight 400).
+   Hero tracking is -0.02em; body and UI stay on Inter. */
 .font-display {
   font-family: "Space Grotesk Variable", "Space Grotesk", "Inter Variable", sans-serif;
   font-weight: 400;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
+}
+
+/* Linearity focus: a 2px Signal Orange outline with a 2px offset on every
+   keyboard-focusable element that does not already carry the toolkit ring.
+   Toolkit buttons keep their ring-2 (already orange in dark mode); this
+   covers native inputs, checkboxes, links and rows. */
+:focus-visible {
+  outline: 2px solid var(--color-signal-orange);
+  outline-offset: 2px;
 }
 
 ::-webkit-scrollbar {
